@@ -6,6 +6,7 @@ import Login from "./components/Login/Login.jsx";
 import RootLayout from "./layouts/RootLayout.jsx";
 import AdminLayout from "./layouts/AdminLayout.jsx";
 import { Page } from "./components/AdminDashboard/page.jsx";
+import { AdminContextProvider } from "./contexts/AdminContext.jsx";
 
 const router = createBrowserRouter([
   {
@@ -17,11 +18,19 @@ const router = createBrowserRouter([
       },
       {
         path: "admin",
-        element: <AdminLayout />,
+        element: (
+          <AdminContextProvider>
+            <AdminLayout />
+          </AdminContextProvider>
+        ),
         children: [
           {
             path: "admin-dashboard",
-            element: <Page />,
+            element: (
+              <AdminContextProvider>
+                <Page />
+              </AdminContextProvider>
+            ),
           },
         ],
       },
