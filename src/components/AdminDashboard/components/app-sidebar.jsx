@@ -50,7 +50,7 @@ const data = {
   ],
   navMain: [
     {
-      title: "Playground",
+      title: "Dashboard",
       url: "#",
       icon: SquareTerminal,
       isActive: true,
@@ -162,7 +162,7 @@ export function AppSidebar({ ...props }) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        {/*  <NavProjects projects={data.projects} /> */}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
