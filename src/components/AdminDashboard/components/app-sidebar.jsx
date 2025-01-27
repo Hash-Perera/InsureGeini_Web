@@ -60,7 +60,7 @@ const data = {
           url: "#",
         },
         {
-          title: "Starred",
+          title: "Started",
           url: "#",
         },
         {
