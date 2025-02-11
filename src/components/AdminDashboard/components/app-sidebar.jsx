@@ -70,16 +70,16 @@ const data = {
       ],
     },
     {
-      title: "Models",
+      title: "Users",
       url: "#",
       icon: Bot,
       items: [
         {
-          title: "Genesis",
+          title: "Staff",
           url: "#",
         },
         {
-          title: "Explorer",
+          title: "Clients",
           url: "#",
         },
         {

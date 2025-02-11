@@ -17,10 +17,12 @@ import {
 import { useAdminContext } from "@/contexts/AdminContext";
 import { Init } from "./Pages/Init";
 import Started from "./Pages/Started";
+import Staff from "./Pages/Staff";
+import Clients from "./Pages/Clients";
 
 export function Page() {
   const { activePage, activeChildPage } = useAdminContext();
-  console.log(activeChildPage);
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -47,6 +49,8 @@ export function Page() {
           <div className="min-h-[100vh] w-full flex-1 rounded-xl  md:min-h-min">
             {activeChildPage === "History" && <Init />}
             {activeChildPage === "Started" && <Started />}
+            {activeChildPage === "Staff" && <Staff />}
+            {activeChildPage === "Clients" && <Clients />}
           </div>
         </div>
       </SidebarInset>
