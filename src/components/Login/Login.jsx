@@ -18,6 +18,7 @@ const signInSchema = z.object({
     .string()
     .min(1, "Email field cannot be empty")
     .email("Please enter a valid email address"),
+  password: z.string().min(1, "Password field cannot be empty"),
 });
 
 const Login = () => {
@@ -28,6 +29,7 @@ const Login = () => {
     resolver: zodResolver(signInSchema),
     defaultValues: {
       email: "",
+      password: "",
     },
   });
   return (
@@ -70,6 +72,27 @@ const Login = () => {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Enter your password"
+                      {...field}
+                      className={
+                        form.formState.errors.password
+                          ? "border-[#F44336] focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:ring-0"
+                          : " focus:border-[#A1A1AA] border-[#E4E4E7] focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:ring-0"
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage className=" text-[#F44336]" />
+                </FormItem>
+              )}
+            />
             {error &&
               Object.keys(form?.formState?.errors || {}).length === 0 && (
                 <FormMessage className=" text-[#F44336]">{error}</FormMessage>
@@ -85,7 +108,7 @@ const Login = () => {
               }}
             >
               <span className="text-[16px] font-medium">
-                "Continue with email -{">"}
+                Continue with email
               </span>
             </button>
           </form>

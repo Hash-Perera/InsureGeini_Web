@@ -264,10 +264,22 @@ export const Feedback = () => {
             value: sentimentStats.sentimentCounts?.Negative || 0,
           },
         ].map((item, index) => (
-          <Card className="transition-transform duration-75 transform hover:scale-105">
+          <Card className="transition-transform duration-75 transform rounded-2xl hover:scale-105">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="font-medium text-md">
-                {item.title}
+              <CardTitle className="flex items-center gap-2 font-medium text-md">
+                {index === 0 && (
+                  <span className="bg-blue-500 rounded-full size-2 "></span>
+                )}
+                {index === 1 && (
+                  <span className="bg-green-500 rounded-full size-2 "></span>
+                )}
+                {index === 2 && (
+                  <span className="bg-yellow-500 rounded-full size-2 "></span>
+                )}
+                {index === 3 && (
+                  <span className="bg-red-500 rounded-full size-2 "></span>
+                )}
+                <span>{item.title}</span>
               </CardTitle>
               {index === 0 && (
                 <MessageSquareQuote size={24} className="text-blue-500" />
@@ -279,7 +291,7 @@ export const Feedback = () => {
               {index === 3 && <ThumbsDown size={24} className="text-red-500" />}
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold "> {item.value}</div>
+              <div className="pl-1 text-3xl font-bold "> {item.value}</div>
             </CardContent>
           </Card>
         ))}
@@ -287,7 +299,7 @@ export const Feedback = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-2 gap-4 overflow-hidden ">
-        <Card className="flex flex-col px-2 hover:shadow-lg ">
+        <Card className="flex flex-col px-2 rounded-2xl hover:shadow-lg ">
           <CardHeader>
             <h2 className="mb-4 text-xl font-semibold text-gray-700">
               Feedback by Sentiment
@@ -318,7 +330,7 @@ export const Feedback = () => {
           </CardContent>
         </Card>
 
-        <Card className="px-2 hover:shadow-lg ">
+        <Card className="px-2 hover:shadow-lg rounded-2xl ">
           <CardHeader>
             <h2 className="mb-4 text-xl font-semibold text-gray-700">
               Feedback by Category
