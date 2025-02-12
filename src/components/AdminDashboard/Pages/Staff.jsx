@@ -1,5 +1,4 @@
 import StaffRegistration from "@/components/Registrations/StaffRegistration";
-import { DataTable } from "@/components/ui/data-table";
 import {
   Dialog,
   DialogContent,
@@ -8,6 +7,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import SharedDataTable from "../components/SharedDataTable";
+
 const Staff = () => {
   return (
     <div className="flex flex-col justify-center w-full gap-8">
@@ -30,39 +31,7 @@ const Staff = () => {
       </div>
 
       {/* Staff table */}
-      <DataTable
-        columns={[
-          {
-            accessorKey: "name",
-            header: "Name",
-          },
-          {
-            accessorKey: "email",
-            header: "Email",
-          },
-          {
-            accessorKey: "phone",
-            header: "Phone",
-          },
-          {
-            accessorKey: "role",
-            header: "Role",
-          },
-          {
-            accessorKey: "actions",
-            header: "Actions",
-          },
-        ]}
-        data={[
-          {
-            name: "John Doe",
-            email: "",
-            phone: "",
-            role: "Admin",
-            actions: "",
-          },
-        ]}
-      />
+      {/*  <SharedDataTable /> */}
     </div>
   );
 };

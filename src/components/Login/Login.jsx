@@ -18,6 +18,7 @@ const signInSchema = z.object({
     .string()
     .min(1, "Email field cannot be empty")
     .email("Please enter a valid email address"),
+  password: z.string().min(1, "Password field cannot be empty"),
 });
 
 const Login = () => {
@@ -28,6 +29,7 @@ const Login = () => {
     resolver: zodResolver(signInSchema),
     defaultValues: {
       email: "",
+      password: "",
     },
   });
   return (
@@ -36,7 +38,7 @@ const Login = () => {
       <div className="flex items-center justify-center w-28 h-28">
         <img src="/images/logo.jpeg" alt="InsureGeni" />
       </div>
-      <div className="flex flex-col w-full  ">
+      <div className="flex flex-col w-full ">
         <h1 className=" font-semibold text-center text-[1.5rem]">
           Sign in to InsureGeni
         </h1>
@@ -70,6 +72,27 @@ const Login = () => {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Enter your password"
+                      {...field}
+                      className={
+                        form.formState.errors.password
+                          ? "border-[#F44336] focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:ring-0"
+                          : " focus:border-[#A1A1AA] border-[#E4E4E7] focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:ring-0"
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage className=" text-[#F44336]" />
+                </FormItem>
+              )}
+            />
             {error &&
               Object.keys(form?.formState?.errors || {}).length === 0 && (
                 <FormMessage className=" text-[#F44336]">{error}</FormMessage>
@@ -78,13 +101,14 @@ const Login = () => {
             <button
               className="inline-flex gap-x-1.5 items-center justify-center w-full h-10 px-4 py-2 mt-2 text-xs font-medium transition rounded-md whitespace-nowrap ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-[#191B33] text-zinc-50"
               //type="submit"
+              type="button"
               //disabled={loading}
               onClick={() => {
                 navigate("/admin/admin-dashboard");
               }}
             >
               <span className="text-[16px] font-medium">
-                {loading ? "Sending link..." : "Continue with email ->"}
+                Continue with email
               </span>
             </button>
           </form>
