@@ -1,6 +1,5 @@
 "use client";
-
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -9,7 +8,7 @@ import {
   getSortedRowModel,
   flexRender,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,131 +24,24 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-// Sample feedback data
-const feedbackData = [
-  {
-    _id: "1",
-    userId: "John Doe",
-    feedback: "Great service!",
-    sentiment: "Positive",
-    category: "Customer Service",
-  },
-  {
-    _id: "2",
-    userId: "Jane Smith",
-    feedback: "Could be better.",
-    sentiment: "Neutral",
-    category: "Product",
-  },
-  {
-    _id: "3",
-    userId: "Bob Johnson",
-    feedback: "Very bad experience.",
-    sentiment: "Negative",
-    category: "Support",
-  },
-  {
-    _id: "4",
-    userId: "Alice Brown",
-    feedback: "Fast response, thanks!",
-    sentiment: "Positive",
-    category: "Customer Service",
-  },
-  {
-    _id: "5",
-    userId: "Charlie Green",
-    feedback: "Product quality is poor.",
-    sentiment: "Negative",
-    category: "Product",
-  },
-];
-
-// Column definitions
-const columns = [
-  {
-    accessorKey: "userId",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        User <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("userId")}</div>
-    ),
-  },
-  {
-    accessorKey: "feedback",
-    header: "Feedback",
-    cell: ({ row }) => <div>{row.getValue("feedback")}</div>,
-  },
-  {
-    accessorKey: "sentiment",
-    header: "Sentiment",
-    cell: ({ row }) => {
-      const sentiment = row.getValue("sentiment");
-      const color =
-        sentiment === "Positive"
-          ? "text-green-600"
-          : sentiment === "Negative"
-          ? "text-red-600"
-          : "text-yellow-600";
-      return <div className={`font-semibold ${color}`}>{sentiment}</div>;
-    },
-  },
-  {
-    accessorKey: "category",
-    header: "Category",
-    cell: ({ row }) => (
-      <div className="font-medium text-blue-600">
-        {row.getValue("category")}
-      </div>
-    ),
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const feedback = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="w-8 h-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(feedback._id)}
-            >
-              Copy Feedback ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View Details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
-  },
-];
-
-export default function FeedbackTable({ data }) {
+export default function SharedDataTable({ data, columns, searchBy = [] }) {
   const [filterText, setFilterText] = useState("");
   const [columnVisibility, setColumnVisibility] = useState({});
 
+  const filteredData = useMemo(() => {
+    if (!filterText) return data;
+    return data.filter((row) =>
+      searchBy.some((key) =>
+        row[key]?.toString().toLowerCase().includes(filterText.toLowerCase())
+      )
+    );
+  }, [data, filterText, searchBy]);
+
   const table = useReactTable({
-    data: data,
+    data: filteredData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -161,14 +53,12 @@ export default function FeedbackTable({ data }) {
     },
   });
 
-  console.log(filterText, "filterText");
-
   return (
     <div className="w-full">
       {/* Filters & Controls */}
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter by user..."
+          placeholder={`Search by ${searchBy.join(", ")}...`}
           value={filterText}
           onChange={(e) => setFilterText(e.target.value)}
           className="max-w-sm"

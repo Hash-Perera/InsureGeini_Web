@@ -78,6 +78,17 @@ const data = {
         },
       ],
     },
+    {
+      title: "Reports",
+      url: "#",
+      icon: Bot,
+      items: [
+        {
+          title: "Incident-Reports",
+          url: "#",
+        },
+      ],
+    },
 
     {
       title: "Customer Reviews",

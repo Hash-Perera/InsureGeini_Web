@@ -20,6 +20,7 @@ import Started from "./Pages/Started";
 import Staff from "./Pages/Staff";
 import Clients from "./Pages/Clients";
 import { Feedback } from "./Pages/Feedback";
+import Reports from "./Pages/Reports";
 
 export function Page() {
   const { activePage, activeChildPage } = useAdminContext();
@@ -52,6 +53,8 @@ export function Page() {
           {activeChildPage === "Staff" && <Staff />}
           {activeChildPage === "Clients" && <Clients />}
           {activeChildPage === "Reviews Dashboard" && <Feedback />}
+          {activeChildPage === "Incident-Reports" && <Reports />}
+
           <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
         </div>
       </SidebarInset>
