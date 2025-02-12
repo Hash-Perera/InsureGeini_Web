@@ -11,7 +11,7 @@ const chartData = [
   { month: "June", desktop: 214, mobile: 140 },
 ];
 
-const chartConfig = {
+export const chartConfig = {
   desktop: {
     label: "Desktop",
     color: "hsl(var(--chart-1))",

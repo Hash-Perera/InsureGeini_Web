@@ -8,12 +8,10 @@ import {
   GalleryVerticalEnd,
   Map,
   PieChart,
-  Settings2,
   SquareTerminal,
 } from "lucide-react";
 
 import { NavMain } from "@/components/AdminDashboard/components/nav-main";
-import { NavProjects } from "@/components/AdminDashboard/components/nav-projects";
 import { NavUser } from "@/components/AdminDashboard/components/nav-user";
 import { TeamSwitcher } from "@/components/AdminDashboard/components/team-switcher";
 import {
@@ -63,10 +61,6 @@ const data = {
           title: "Started",
           url: "#",
         },
-        {
-          title: "Settings",
-          url: "#",
-        },
       ],
     },
     {
@@ -82,54 +76,16 @@ const data = {
           title: "Clients",
           url: "#",
         },
-        {
-          title: "Quantum",
-          url: "#",
-        },
       ],
     },
+
     {
-      title: "Documentation",
+      title: "Customer Reviews",
       url: "#",
       icon: BookOpen,
       items: [
         {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
+          title: "Reviews Dashboard",
           url: "#",
         },
       ],
@@ -162,7 +118,6 @@ export function AppSidebar({ ...props }) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        {/*  <NavProjects projects={data.projects} /> */}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
