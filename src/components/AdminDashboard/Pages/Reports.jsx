@@ -11,8 +11,9 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import SharedDataTable from "../components/SharedDataTable";
 import { useQuery } from "@tanstack/react-query";
-import { fetchAllReports } from "@/services/reports";
+import { fetchAllReports, fetchReportStats } from "@/services/reports";
 import clsx from "clsx";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const columns = [
   {
@@ -164,8 +165,65 @@ const Reports = () => {
     retry: false,
   });
 
+  const { data: reportStats } = useQuery({
+    queryKey: ["basicStats"],
+    queryFn: async () => {
+      try {
+        const response = await fetchReportStats();
+        return response;
+      } catch (error) {
+        console.error("Error fetching all reports:", error.message);
+        throw error;
+      }
+    },
+    staleTime: Infinity,
+    retry: false,
+  });
+
   return (
-    <main>
+    <main className="flex flex-col gap-3">
+      <div className="grid grid-cols-4 gap-3 ">
+        <Card>
+          <CardHeader>
+            <CardTitle>Approved</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-bold text-green-600">
+              {reportStats?.approvedReports}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Rejected</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-bold text-red-600">
+              {reportStats?.rejectedReports}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Pending</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-bold text-yellow-600">
+              {reportStats?.pendingReports}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Total</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-bold text-blue-600">
+              {reportStats?.totalReports}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
       <SharedDataTable
         data={reportData || []}
         columns={columns}

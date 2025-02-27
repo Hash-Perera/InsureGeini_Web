@@ -29,7 +29,7 @@ export const fetchReportStats = async (filters = {}) => {
     const response = await axiosInstance.get("/reports/stats", {
       params: filters,
     });
-    return response.data;
+    return response?.data;
   } catch (error) {
     console.error("Error fetching report statistics:", error.message);
     throw error;
