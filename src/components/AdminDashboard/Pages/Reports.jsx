@@ -10,10 +10,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import SharedDataTable from "../components/SharedDataTable";
+import { useQuery } from "@tanstack/react-query";
+import { fetchAllReports } from "@/services/reports";
+import clsx from "clsx";
 
 const columns = [
   {
-    accessorKey: "date",
+    accessorKey: "createdAt", // Assuming 'date' exists or you want to show the creation date
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -22,28 +25,78 @@ const columns = [
         Date <ArrowUpDown />
       </Button>
     ),
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("createdAt"));
+      const formattedDate = date.toLocaleDateString(); // Converts to a readable format (local timezone)
+
+      return <div className="font-medium">{formattedDate}</div>;
+    },
+  },
+  {
+    accessorKey: "userId", // Mapping userId to the table
+    header: "User ID",
     cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("date")}</div>
+      <div className="font-medium text-blue-600">{row.getValue("userId")}</div>
     ),
   },
   {
-    accessorKey: "clientId",
-    header: "Client ID",
+    accessorKey: "claimId", // Mapping claimId to the table
+    header: "Claim ID",
     cell: ({ row }) => (
-      <div className="font-medium text-blue-600">
-        {row.getValue("clientId")}
+      <div className="font-medium text-blue-600">{row.getValue("claimId")}</div>
+    ),
+  },
+  {
+    accessorKey: "status", // Mapping status to the table
+    header: "Status",
+    cell: ({ row }) => {
+      const status = row.getValue("status"); // Get the status value
+
+      return (
+        <div
+          className={clsx(
+            "font-medium",
+            status === "Approved"
+              ? "text-green-600" // Green for Approved
+              : status === "Rejected"
+              ? "text-red-600" // Red for Rejected
+              : "text-yellow-600" // Yellow for Pending
+          )}
+        >
+          {status}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "decisionReport", // Mapping decisionReport to the table
+    header: "Decision Report",
+    cell: ({ row }) => (
+      <div className="max-w-xs truncate" title={row.getValue("decisionReport")}>
+        {row.getValue("decisionReport")}
       </div>
     ),
   },
   {
-    accessorKey: "recordedBy",
-    header: "Recorded By",
+    accessorKey: "estimation_approved", // Mapping estimation_approved to the table
+    header: "Estimation Approved",
     cell: ({ row }) => (
-      <div className="text-gray-700">{row.getValue("recordedBy")}</div>
+      <div className="font-medium text-gray-700">
+        {row.getValue("estimation_approved")}
+      </div>
     ),
   },
   {
-    accessorKey: "incidentReport",
+    accessorKey: "estimation_requested", // Mapping estimation_requested to the table
+    header: "Estimation Requested",
+    cell: ({ row }) => (
+      <div className="font-medium text-gray-700">
+        {row.getValue("estimation_requested")}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "incidentReport", // Mapping incidentReport to the table
     header: "Incident Report",
     cell: ({ row }) => (
       <div className="max-w-xs truncate" title={row.getValue("incidentReport")}>
@@ -52,11 +105,11 @@ const columns = [
     ),
   },
   {
-    accessorKey: "policyReport",
-    header: "Policy Report",
+    accessorKey: "reason", // Mapping reason to the table
+    header: "Reason",
     cell: ({ row }) => (
-      <div className="max-w-xs truncate" title={row.getValue("policyReport")}>
-        {row.getValue("policyReport")}
+      <div className="max-w-xs truncate" title={row.getValue("reason")}>
+        {row.getValue("reason")}
       </div>
     ),
   },
@@ -77,9 +130,14 @@ const columns = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(record.clientId)}
+              onClick={() => navigator.clipboard.writeText(record.userId)}
             >
-              Copy Client ID
+              Copy User ID
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => navigator.clipboard.writeText(record.claimId)}
+            >
+              Copy Claim ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>View Details</DropdownMenuItem>
@@ -89,156 +147,29 @@ const columns = [
     },
   },
 ];
-const data = [
-  {
-    date: "2025-02-01",
-    clientId: "C001",
-    recordedBy: "John Doe",
-    incidentReport: "Vehicle collision at intersection, minor damage.",
-    policyReport: "Claim filed under comprehensive coverage.",
-  },
-  {
-    date: "2025-02-02",
-    clientId: "C002",
-    recordedBy: "Alice Smith",
-    incidentReport: "Water leakage in the kitchen, ceiling damage.",
-    policyReport: "Home insurance claim under plumbing coverage.",
-  },
-  {
-    date: "2025-02-03",
-    clientId: "C003",
-    recordedBy: "Michael Brown",
-    incidentReport: "Theft reported at office premises.",
-    policyReport: "Coverage under commercial property insurance.",
-  },
-  {
-    date: "2025-02-04",
-    clientId: "C004",
-    recordedBy: "Sophia Johnson",
-    incidentReport: "Fire damage in storage unit.",
-    policyReport: "Policy covers fire and smoke damage.",
-  },
-  {
-    date: "2025-02-05",
-    clientId: "C005",
-    recordedBy: "David Wilson",
-    incidentReport: "Slip and fall injury in shopping mall.",
-    policyReport: "Liability insurance claim initiated.",
-  },
-  {
-    date: "2025-02-06",
-    clientId: "C006",
-    recordedBy: "Emma Davis",
-    incidentReport: "Hailstorm damaged roof.",
-    policyReport: "Home insurance covers weather-related damages.",
-  },
-  {
-    date: "2025-02-07",
-    clientId: "C007",
-    recordedBy: "Oliver Martinez",
-    incidentReport: "Car stolen from parking lot.",
-    policyReport: "Comprehensive auto insurance claim filed.",
-  },
-  {
-    date: "2025-02-08",
-    clientId: "C008",
-    recordedBy: "Mia Anderson",
-    incidentReport: "Flooding in basement after heavy rain.",
-    policyReport: "Flood insurance policy activated.",
-  },
-  {
-    date: "2025-02-09",
-    clientId: "C009",
-    recordedBy: "James White",
-    incidentReport: "Employee injury at construction site.",
-    policyReport: "Workers' compensation insurance claim.",
-  },
-  {
-    date: "2025-02-10",
-    clientId: "C010",
-    recordedBy: "Charlotte Thomas",
-    incidentReport: "Electrical short circuit caused appliance damage.",
-    policyReport: "Home insurance electrical damage coverage applied.",
-  },
-  {
-    date: "2025-02-01",
-    clientId: "C001",
-    recordedBy: "John Doe",
-    incidentReport: "Vehicle collision at intersection, minor damage.",
-    policyReport: "Claim filed under comprehensive coverage.",
-  },
-  {
-    date: "2025-02-02",
-    clientId: "C002",
-    recordedBy: "Alice Smith",
-    incidentReport: "Water leakage in the kitchen, ceiling damage.",
-    policyReport: "Home insurance claim under plumbing coverage.",
-  },
-  {
-    date: "2025-02-03",
-    clientId: "C003",
-    recordedBy: "Michael Brown",
-    incidentReport: "Theft reported at office premises.",
-    policyReport: "Coverage under commercial property insurance.",
-  },
-  {
-    date: "2025-02-04",
-    clientId: "C004",
-    recordedBy: "Sophia Johnson",
-    incidentReport: "Fire damage in storage unit.",
-    policyReport: "Policy covers fire and smoke damage.",
-  },
-  {
-    date: "2025-02-05",
-    clientId: "C005",
-    recordedBy: "David Wilson",
-    incidentReport: "Slip and fall injury in shopping mall.",
-    policyReport: "Liability insurance claim initiated.",
-  },
-  {
-    date: "2025-02-06",
-    clientId: "C006",
-    recordedBy: "Emma Davis",
-    incidentReport: "Hailstorm damaged roof.",
-    policyReport: "Home insurance covers weather-related damages.",
-  },
-  {
-    date: "2025-02-07",
-    clientId: "C007",
-    recordedBy: "Oliver Martinez",
-    incidentReport: "Car stolen from parking lot.",
-    policyReport: "Comprehensive auto insurance claim filed.",
-  },
-  {
-    date: "2025-02-08",
-    clientId: "C008",
-    recordedBy: "Mia Anderson",
-    incidentReport: "Flooding in basement after heavy rain.",
-    policyReport: "Flood insurance policy activated.",
-  },
-  {
-    date: "2025-02-09",
-    clientId: "C009",
-    recordedBy: "James White",
-    incidentReport: "Employee injury at construction site.",
-    policyReport: "Workers' compensation insurance claim.",
-  },
-  {
-    date: "2025-02-20",
-    clientId: "C020",
-    recordedBy: "Charlotte Thomas",
-    incidentReport: "Electrical short circuit caused appliance damage.",
-    policyReport: "fuck fuck",
-  },
-];
 
 const Reports = () => {
+  const { data: reportData } = useQuery({
+    queryKey: ["Reports"],
+    queryFn: async () => {
+      try {
+        const response = await fetchAllReports();
+        return response;
+      } catch (error) {
+        console.error("Error fetching all reports:", error.message);
+        throw error;
+      }
+    },
+    staleTime: Infinity,
+    retry: false,
+  });
+
   return (
     <main>
       <SharedDataTable
-        data={data}
+        data={reportData || []}
         columns={columns}
-        searchBy={["date", "clientId"]}
+        searchBy={["date", "clientId", "status"]}
       />
     </main>
   );
