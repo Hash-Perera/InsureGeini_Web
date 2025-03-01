@@ -12,12 +12,11 @@ import {
   FormControl,
 } from "@/components/ui/form";
 import OAuthSignIn from "./OAuthSignIn";
+import { useMutation } from "@tanstack/react-query";
+import { login } from "@/services/auth";
 
 const signInSchema = z.object({
-  email: z
-    .string()
-    .min(1, "Email field cannot be empty")
-    .email("Please enter a valid email address"),
+  insuranceId: z.string().min(1, "Password field cannot be empty"),
   password: z.string().min(1, "Password field cannot be empty"),
 });
 
@@ -28,10 +27,27 @@ const Login = () => {
   const form = useForm({
     resolver: zodResolver(signInSchema),
     defaultValues: {
-      email: "",
+      insuranceId: "",
       password: "",
     },
   });
+
+  const handleSubmit = useMutation({
+    mutationFn: async (data) => {
+      try {
+        const response = await login(data.insuranceId, data.password);
+        const { token, role } = response;
+        localStorage.setItem("token", token);
+        localStorage.setItem("role", role);
+        navigate("/admin");
+        return response;
+      } catch (error) {
+        console.error("Error logging in:", error.message);
+        throw error;
+      }
+    },
+  });
+
   return (
     <div className="flex  w-full flex-col items-center max-w-[380px]  h-screen  mx-auto  justify-center  px-4">
       {/* Brand logo */}
@@ -54,7 +70,7 @@ const Login = () => {
           >
             <FormField
               control={form.control}
-              name="email"
+              name="insuranceId"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
@@ -62,7 +78,7 @@ const Login = () => {
                       placeholder="Enter your email"
                       {...field}
                       className={
-                        form.formState.errors.email
+                        form.formState.errors.insuranceId
                           ? "border-[#F44336] focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:ring-0"
                           : " focus:border-[#A1A1AA] border-[#E4E4E7] focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:ring-0"
                       }
@@ -103,9 +119,10 @@ const Login = () => {
               //type="submit"
               type="button"
               //disabled={loading}
-              onClick={() => {
+              /*   onClick={() => {
                 navigate("/admin/admin-dashboard");
-              }}
+              }} */
+              onClick={form.handleSubmit(handleSubmit.mutate)}
             >
               <span className="text-[16px] font-medium">
                 Continue with email
