@@ -1,7 +1,7 @@
+// NavMain.jsx
 "use client";
 
 import { ChevronRight } from "lucide-react";
-
 import {
   Collapsible,
   CollapsibleContent,
@@ -18,11 +18,13 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { useAdminContext } from "@/contexts/AdminContext";
+import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
 
 export function NavMain({ items }) {
   const { setActivePage, setActiveChildPage, activePage, activeChildPage } =
     useAdminContext();
+  const navigate = useNavigate();
 
   const handleSetActivePage = (page) => {
     setActivePage(page);
@@ -32,9 +34,13 @@ export function NavMain({ items }) {
     setActiveChildPage(page);
   };
 
+  const handleNavigation = (url) => {
+    navigate(url);
+  };
+
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel>Admin</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible
@@ -50,6 +56,7 @@ export function NavMain({ items }) {
                   onClick={() => {
                     handleSetActivePage(item.title);
                     handleSetActiveChildPage(item.items?.[0]?.title);
+                    handleNavigation(item?.items?.[0]?.url);
                   }}
                 >
                   {item.icon && <item.icon />}
@@ -73,18 +80,16 @@ export function NavMain({ items }) {
                         onClick={() => {
                           handleSetActivePage(item.title);
                           handleSetActiveChildPage(subItem.title);
+                          handleNavigation(subItem.url);
                         }}
                       >
-                        <a href={subItem.url}>
-                          <span
-                            className={clsx(
-                              activeChildPage === subItem.title &&
-                                "font-semibold"
-                            )}
-                          >
-                            {subItem.title}
-                          </span>
-                        </a>
+                        <span
+                          className={clsx(
+                            activeChildPage === subItem.title && "font-semibold"
+                          )}
+                        >
+                          {subItem.title}
+                        </span>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   ))}

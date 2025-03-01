@@ -11,7 +11,6 @@ import {
   FormMessage,
   FormControl,
 } from "@/components/ui/form";
-import OAuthSignIn from "./OAuthSignIn";
 import { useMutation } from "@tanstack/react-query";
 import { login } from "@/services/auth";
 
@@ -23,7 +22,6 @@ const signInSchema = z.object({
 const Login = () => {
   const navigate = useNavigate();
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const form = useForm({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -39,7 +37,7 @@ const Login = () => {
         const { token, role } = response;
         localStorage.setItem("token", token);
         localStorage.setItem("role", role);
-        navigate("/admin");
+        navigate("/admin/staff");
         return response;
       } catch (error) {
         console.error("Error logging in:", error.message);
@@ -64,10 +62,7 @@ const Login = () => {
       </div>
       <div className="flex flex-col w-full gap-4 mt-[32px] ">
         <Form {...form}>
-          <form
-            //  onSubmit={form.handleSubmit(handleEmailSignIn)}
-            className="w-full space-y-2"
-          >
+          <form className="w-full space-y-2">
             <FormField
               control={form.control}
               name="insuranceId"
@@ -116,12 +111,7 @@ const Login = () => {
 
             <button
               className="inline-flex gap-x-1.5 items-center justify-center w-full h-10 px-4 py-2 mt-2 text-xs font-medium transition rounded-md whitespace-nowrap ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-[#191B33] text-zinc-50"
-              //type="submit"
               type="button"
-              //disabled={loading}
-              /*   onClick={() => {
-                navigate("/admin/admin-dashboard");
-              }} */
               onClick={form.handleSubmit(handleSubmit.mutate)}
             >
               <span className="text-[16px] font-medium">
@@ -130,25 +120,7 @@ const Login = () => {
             </button>
           </form>
         </Form>
-
-        <div className="relative mt-2">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
-          </div>
-          <div className="relative flex justify-center text-[12px]">
-            <span className="px-2 text-gray-500 uppercase bg-white">
-              Or continue with
-            </span>
-          </div>
-        </div>
       </div>
-      <OAuthSignIn setError={setError} />
-      <button
-        onClick={() => handlePasskeySignIn()}
-        className="text-sm font-medium underline underline-offset-2"
-      >
-        Use passkey instead
-      </button>
     </div>
   );
 };
