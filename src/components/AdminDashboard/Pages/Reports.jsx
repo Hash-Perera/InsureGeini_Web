@@ -34,11 +34,17 @@ const columns = [
     },
   },
   {
-    accessorKey: "userId", // Mapping userId to the table
+    accessorKey: "userId",
     header: "User ID",
-    cell: ({ row }) => (
-      <div className="font-medium text-blue-600">{row.getValue("userId")}</div>
-    ),
+    cell: ({ row }) => {
+      return (
+        <div className="font-medium text-blue-600">
+          <a href={`/admin/reports/${row.getValue("userId")}`}>
+            {row.getValue("userId")}
+          </a>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "claimId", // Mapping claimId to the table
@@ -189,7 +195,7 @@ const Reports = () => {
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-bold text-green-600">
-              {reportStats?.approvedReports}
+              {reportStats?.data?.approvedReports}
             </div>
           </CardContent>
         </Card>
@@ -199,7 +205,7 @@ const Reports = () => {
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-bold text-red-600">
-              {reportStats?.rejectedReports}
+              {reportStats?.data?.rejectedReports}
             </div>
           </CardContent>
         </Card>
@@ -209,7 +215,7 @@ const Reports = () => {
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-bold text-yellow-600">
-              {reportStats?.pendingReports}
+              {reportStats?.data?.pendingReports}
             </div>
           </CardContent>
         </Card>
@@ -219,7 +225,7 @@ const Reports = () => {
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-bold text-blue-600">
-              {reportStats?.totalReports}
+              {reportStats?.data?.totalReports}
             </div>
           </CardContent>
         </Card>

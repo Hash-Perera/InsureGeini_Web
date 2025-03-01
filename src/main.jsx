@@ -31,6 +31,10 @@ const router = createBrowserRouter([
         ),
         children: [
           {
+            path: "reports/:userId",
+            element: <div>Report id </div>,
+          },
+          {
             path: "staff",
             element: <Staff />,
           },

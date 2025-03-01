@@ -15,22 +15,21 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { useLocation } from "react-router-dom";
 import { useAdminContext } from "@/contexts/AdminContext";
 
 function AdminLayout() {
-  const { activePage, activeChildPage } = useAdminContext();
   const navigate = useNavigate();
 
   const token = localStorage.getItem("authToken");
+  const location = useLocation();
+  const pathnames = location.pathname.split("/").filter(Boolean);
 
   useEffect(() => {
-    if (token) {
-      navigate("/admin/staff");
+    if (!token) {
+      navigate("/");
     }
-    navigate("/");
   }, [token, navigate]);
-
-  console.log(token, "token");
 
   return (
     <SidebarProvider>
@@ -42,13 +41,25 @@ function AdminLayout() {
             <Separator orientation="vertical" className="h-4 mr-2" />
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">{activePage}</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>{activeChildPage}</BreadcrumbPage>
-                </BreadcrumbItem>
+                {pathnames.map((name, index) => {
+                  const routeTo = `/${pathnames.slice(0, index + 1).join("/")}`;
+                  const isLast = index === pathnames.length - 1;
+                  const isFirst = index === 0;
+                  return (
+                    <React.Fragment key={routeTo}>
+                      <BreadcrumbItem>
+                        {isFirst ? (
+                          <BreadcrumbLink>{name}</BreadcrumbLink>
+                        ) : isLast ? (
+                          <BreadcrumbPage>{name}</BreadcrumbPage>
+                        ) : (
+                          <BreadcrumbLink href={routeTo}>{name}</BreadcrumbLink>
+                        )}
+                      </BreadcrumbItem>
+                      {!isLast && <BreadcrumbSeparator />}
+                    </React.Fragment>
+                  );
+                })}
               </BreadcrumbList>
             </Breadcrumb>
           </div>
