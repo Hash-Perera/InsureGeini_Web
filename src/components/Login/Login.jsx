@@ -15,7 +15,7 @@ import { useMutation } from "@tanstack/react-query";
 import { login } from "@/services/auth";
 
 const signInSchema = z.object({
-  insuranceId: z.string().min(1, "Password field cannot be empty"),
+  email: z.string().min(1, "Password field cannot be empty"),
   password: z.string().min(1, "Password field cannot be empty"),
 });
 
@@ -25,7 +25,7 @@ const Login = () => {
   const form = useForm({
     resolver: zodResolver(signInSchema),
     defaultValues: {
-      insuranceId: "",
+      email: "",
       password: "",
     },
   });
@@ -33,13 +33,14 @@ const Login = () => {
   const handleSubmit = useMutation({
     mutationFn: async (data) => {
       try {
-        const response = await login(data.insuranceId, data.password);
+        const response = await login(data.email, data.password);
         const { token, role } = response;
         localStorage.setItem("token", token);
         localStorage.setItem("role", role);
         navigate("/admin/staff");
         return response;
       } catch (error) {
+        setError("Invalid email or password");
         console.error("Error logging in:", error.message);
         throw error;
       }
@@ -65,7 +66,7 @@ const Login = () => {
           <form className="w-full space-y-2">
             <FormField
               control={form.control}
-              name="insuranceId"
+              name="email"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
@@ -73,7 +74,7 @@ const Login = () => {
                       placeholder="Enter your email"
                       {...field}
                       className={
-                        form.formState.errors.insuranceId
+                        form.formState.errors.email
                           ? "border-[#F44336] focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:ring-0"
                           : " focus:border-[#A1A1AA] border-[#E4E4E7] focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:ring-0"
                       }

@@ -16,12 +16,12 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useLocation } from "react-router-dom";
-import { useAdminContext } from "@/contexts/AdminContext";
+import { Toaster } from "@/components/ui/sonner";
 
 function AdminLayout() {
   const navigate = useNavigate();
 
-  const token = localStorage.getItem("authToken");
+  const token = localStorage.getItem("token");
   const location = useLocation();
   const pathnames = location.pathname.split("/").filter(Boolean);
 
@@ -71,6 +71,7 @@ function AdminLayout() {
           <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
         </div>
       </SidebarInset>
+      <Toaster />
     </SidebarProvider>
   );
 }
