@@ -11,56 +11,194 @@ import {
   FormControl,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectGroup,
+  SelectLabel,
+  SelectValue,
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import policyData from "./policies.json";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { addCustomer } from "@/services/customer";
+
+const imageFileSchema = z
+  .instanceof(File)
+  .refine((file) => file.size > 0, "File cannot be empty")
+  .refine(
+    (file) => ["image/jpeg", "image/png", "image/gif"].includes(file.type),
+    "Invalid file type"
+  )
+  .refine(
+    (file) => file.size <= 5 * 1024 * 1024,
+    "File size must be less than 5MB"
+  );
 
 // Define Zod Schema
 const clientRegistrationSchema = z.object({
-  firstName: z.string().min(1, "First name cannot be empty"),
-  lastName: z.string().min(1, "Last name cannot be empty"),
-  nic: z.string().min(1, "NIC cannot be empty"),
+  name: z.string().min(1, "First name cannot be empty"),
   email: z
     .string()
     .min(1, "Email cannot be empty")
     .email("Invalid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
-  confirmPassword: z.string().min(8, "Password must be at least 8 characters"),
+  nicNo: z.string().min(1, "NIC cannot be empty"),
+  insuranceId: z.string().min(1, "Insurance ID cannot be empty"),
+  mobileNumber: z.string().min(10, "Invalid mobile number"),
+  address: z.string().min(1, "Address cannot be empty"),
+  role: z.string().min(["client", "value"], "Please select a client type"),
+  dob: z.string().min(1, "Date of birth cannot be empty"),
+  drivingLicenseNo: z.string().min(1, "Driving license number cannot be empty"),
+  inusrancePolicy: z.string().min(1, "Insurance policy cannot be empty"),
+  drivingLicenseImage: imageFileSchema,
+  nicImage: imageFileSchema,
 });
 
 const ClientRegistration = () => {
   const [loading, setLoading] = useState(false);
+  const [nicImage, setNicImage] = useState(null);
+  const [drivingLicenseImage, setDrivingLicenseImage] = useState(null);
 
   const clientRegistrationForm = useForm({
     resolver: zodResolver(clientRegistrationSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      nic: "",
+      name: "",
       email: "",
+      nicNo: "",
       password: "",
-      confirmPassword: "",
+      insuranceId: "",
+      mobileNumber: "",
+      address: "",
+      role: "674831bc5442f8e14a3f3815",
+      dob: "",
+      drivingLicenseNo: "",
+      inusrancePolicy: "Damage to or Loss of Vehicle",
+      nicImage: "",
+      drivingLicenseImage: "",
     },
   });
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const mutation = useMutation({
+    mutationFn: async (data) => {
+      try {
+        const response = await addCustomer(data);
+        toast.success("Customer added successfully");
+        clientRegistrationForm.reset();
+        setLoading(false);
+        return response;
+      } catch (error) {
+        setLoading(false);
+        toast.error("Error adding customer");
+      }
+    },
+  });
+
+  const onSubmit = async (data) => {
+    setLoading(true);
+    console.log("dta ", data);
+
+    // Create a new FormData object
+    const formData = new FormData();
+
+    // Append all form fields to FormData
+    for (const key in data) {
+      if (data[key]) {
+        // Ensures non-null fields are added
+        formData.append(key, data[key]);
+      }
+    }
+
+    // Debug FormData by iterating over its contents
+    formData.forEach((value, key) => {
+      console.log(`${key}: ${value}`);
+    });
+
+    // Now you can pass FormData to the mutation function
+    mutation.mutate(formData);
   };
 
+  const handleImageUpload = (e, type) => {
+    const file = e.target.files[0];
+    if (type === "nicImage") {
+      setNicImage(file);
+      clientRegistrationForm.setValue("nicImage", file);
+    }
+    if (type === "drivingLicenseImage") {
+      setDrivingLicenseImage(file);
+      clientRegistrationForm.setValue("drivingLicenseImage", file);
+    } else {
+      console.error("Invalid image type");
+    }
+  };
+
+  const { errors } = clientRegistrationForm.formState;
+
+  console.log(errors);
   return (
     <Form {...clientRegistrationForm}>
       <form
-        className="w-full space-y-2"
+        className="w-full space-y-4"
         onSubmit={clientRegistrationForm.handleSubmit(onSubmit)}
       >
-        {/* First & Last Name Row */}
+        {/* policy type select */}
+        <FormField
+          control={clientRegistrationForm.control}
+          name="inusrancePolicy"
+          render={({ field }) => (
+            <FormItem>
+              <Label htmlFor="inusrancePolicy">Insurance Policy</Label>
+              <FormControl>
+                <Select
+                  id="inusrancePolicy"
+                  value={field.value} // ✅ Ensure the selected value is managed by React Hook Form
+                  onValueChange={field.onChange} // ✅ Handle changes properly
+                  className="w-full max-w-md"
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select an insurance policy">
+                      {policyData?.insurance_policies?.find(
+                        (policy) => policy.title === field.value
+                      )?.title || "Select an insurance policy"}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Insurance Policies</SelectLabel>
+                      {policyData?.insurance_policies?.map((policy) => (
+                        <SelectItem key={policy.index} value={policy.title}>
+                          <div className="flex flex-col gap-1">
+                            <p className="text-sm font-medium">
+                              {policy.title}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {policy.description}
+                            </p>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Name & NIC Row */}
         <div className="grid grid-cols-2 gap-2">
           <FormField
             control={clientRegistrationForm.control}
-            name="firstName"
+            name="name"
             render={({ field }) => (
               <FormItem>
-                <Label htmlFor="firstName">First Name</Label>
+                <Label htmlFor="name">Full Name</Label>
                 <FormControl>
-                  <Input id="firstName" {...field} className="max-w-md" />
+                  <Input id="name" {...field} className="max-w-md" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -68,12 +206,12 @@ const ClientRegistration = () => {
           />
           <FormField
             control={clientRegistrationForm.control}
-            name="lastName"
+            name="nicNo"
             render={({ field }) => (
               <FormItem>
-                <Label htmlFor="lastName">Last Name</Label>
+                <Label htmlFor="nicNo">NIC</Label>
                 <FormControl>
-                  <Input id="lastName" {...field} className="max-w-md" />
+                  <Input id="nicNo" {...field} className="max-w-md" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -81,8 +219,8 @@ const ClientRegistration = () => {
           />
         </div>
 
+        {/* Email & Mobile Number */}
         <div className="grid grid-cols-2 gap-2">
-          {/* Email */}
           <FormField
             control={clientRegistrationForm.control}
             name="email"
@@ -90,7 +228,7 @@ const ClientRegistration = () => {
               <FormItem>
                 <Label htmlFor="email">Email</Label>
                 <FormControl>
-                  <Input id="email" {...field} className="w-full max-w-md" />
+                  <Input id="email" {...field} className="max-w-md" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -98,12 +236,12 @@ const ClientRegistration = () => {
           />
           <FormField
             control={clientRegistrationForm.control}
-            name="nic"
+            name="mobileNumber"
             render={({ field }) => (
               <FormItem>
-                <Label htmlFor="nic">NIC</Label>
+                <Label htmlFor="mobileNumber">Mobile Number</Label>
                 <FormControl>
-                  <Input id="nic" {...field} className="max-w-md" />
+                  <Input id="mobileNumber" {...field} className="max-w-md" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -111,21 +249,16 @@ const ClientRegistration = () => {
           />
         </div>
 
-        {/* Password & Confirm Password Row */}
+        {/* Address & DOB */}
         <div className="grid grid-cols-2 gap-2">
           <FormField
             control={clientRegistrationForm.control}
-            name="password"
+            name="address"
             render={({ field }) => (
               <FormItem>
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="address">Address</Label>
                 <FormControl>
-                  <Input
-                    id="password"
-                    type="password"
-                    {...field}
-                    className="max-w-md"
-                  />
+                  <Input id="address" {...field} className="max-w-md" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -133,14 +266,43 @@ const ClientRegistration = () => {
           />
           <FormField
             control={clientRegistrationForm.control}
-            name="confirmPassword"
+            name="dob"
             render={({ field }) => (
               <FormItem>
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label htmlFor="dob">Date of Birth</Label>
+                <FormControl>
+                  <Input id="dob" type="date" {...field} className="max-w-md" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* Insurance Policy & Driving License */}
+        <div className="grid grid-cols-2 gap-2">
+          <FormField
+            control={clientRegistrationForm.control}
+            name="insuranceId"
+            render={({ field }) => (
+              <FormItem>
+                <Label htmlFor="insuranceId">Insurance ID</Label>
+                <FormControl>
+                  <Input id="insuranceId" {...field} className="max-w-md" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={clientRegistrationForm.control}
+            name="drivingLicenseNo"
+            render={({ field }) => (
+              <FormItem>
+                <Label htmlFor="drivingLicenseNo">Driving License No</Label>
                 <FormControl>
                   <Input
-                    id="confirmPassword"
-                    type="password"
+                    id="drivingLicenseNo"
                     {...field}
                     className="max-w-md"
                   />
@@ -149,6 +311,67 @@ const ClientRegistration = () => {
               </FormItem>
             )}
           />
+        </div>
+
+        {/* Image Upload Fields */}
+        <div className="grid grid-cols-2 gap-2">
+          <FormItem>
+            <Label>NIC Image</Label>
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleImageUpload(e, "nicImage")}
+            />
+            {nicImage && (
+              <p className="text-sm text-gray-500">{nicImage[0]?.name}</p>
+            )}
+            <FormMessage
+              error={clientRegistrationForm?.formState?.errors?.nicImage}
+            />
+          </FormItem>
+
+          <FormItem>
+            <Label>Driving License Image</Label>
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleImageUpload(e, "drivingLicenseImage")}
+            />
+            {drivingLicenseImage && (
+              <p className="text-sm text-gray-500">
+                {drivingLicenseImage[0]?.name}
+              </p>
+            )}
+            <FormMessage
+              error={
+                clientRegistrationForm?.formState?.errors?.drivingLicenseImage
+              }
+            />
+          </FormItem>
+        </div>
+
+        {/* Password & Confirm Password */}
+        <div className="grid grid-cols-4 gap-2">
+          <div className="col-span-3 ">
+            <FormField
+              control={clientRegistrationForm.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <Label htmlFor="password">Password</Label>
+                  <FormControl>
+                    <Input
+                      id="password"
+                      type="password"
+                      {...field}
+                      className="max-w-md"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
 
         {/* Submit Button */}

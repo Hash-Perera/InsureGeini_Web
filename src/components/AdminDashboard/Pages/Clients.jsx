@@ -1,14 +1,12 @@
 import ClientRegistration from "@/components/Registrations/ClientRegistration";
-import VehicleRegistration from "@/components/Registrations/VehicleRegistration";
-import { DataTable } from "@/components/ui/data-table";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Clients = () => {
   return (
@@ -20,70 +18,17 @@ const Clients = () => {
             Add Client
           </DialogTrigger>
           <DialogContent className="max-w-[39rem]  space-y-4  " close={false}>
-            <Tabs defaultValue="client" className="w-full">
-              <TabsList className="w-full h-11">
-                <TabsTrigger className="w-full h-9" value="client">
-                  Add New Client
-                </TabsTrigger>
-                <TabsTrigger className="w-full h-9" value="vehicle">
-                  Add New Vehicle
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="client">
-                <DialogHeader className={" my-5"}>
-                  <DialogDescription>
-                    Add a new client to the system.
-                  </DialogDescription>
-                </DialogHeader>
-                <ClientRegistration />
-              </TabsContent>
-              <TabsContent value="vehicle">
-                <DialogHeader>
-                  <DialogDescription>
-                    Add a new vehicle to the system.
-                  </DialogDescription>
-                </DialogHeader>
-                <VehicleRegistration />
-              </TabsContent>
-            </Tabs>
+            <DialogHeader>
+              <DialogTitle>Add Client</DialogTitle>
+              <DialogDescription>
+                Add a new client to the system.
+              </DialogDescription>
+            </DialogHeader>
+
+            <ClientRegistration />
           </DialogContent>
         </Dialog>
       </div>
-
-      {/* Client table */}
-      <DataTable
-        columns={[
-          {
-            accessorKey: "name",
-            header: "Name",
-          },
-          {
-            accessorKey: "email",
-            header: "Email",
-          },
-          {
-            accessorKey: "phone",
-            header: "Phone",
-          },
-          {
-            accessorKey: "role",
-            header: "Role",
-          },
-          {
-            accessorKey: "actions",
-            header: "Actions",
-          },
-        ]}
-        data={[
-          {
-            name: "John Doe",
-            email: "",
-            phone: "",
-            role: "Admin",
-            actions: "",
-          },
-        ]}
-      />
     </div>
   );
 };
