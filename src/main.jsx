@@ -11,6 +11,7 @@ import { Feedback } from "./components/AdminDashboard/Pages/Feedback.jsx";
 import Reports from "./components/AdminDashboard/Pages/Reports.jsx";
 import { AdminContextProvider } from "./contexts/AdminContext.jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import AddClient from "./components/AdminDashboard/Pages/AddClient";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
           {
             path: "clients",
             element: <Clients />,
+          },
+          {
+            path: "clients/add",
+            element: <AddClient />,
           },
           {
             path: "feedback",

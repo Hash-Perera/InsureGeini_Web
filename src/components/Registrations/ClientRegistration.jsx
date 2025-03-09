@@ -135,9 +135,6 @@ const ClientRegistration = () => {
     }
   };
 
-  const { errors } = clientRegistrationForm.formState;
-
-  console.log(errors);
   return (
     <Form {...clientRegistrationForm}>
       <form
