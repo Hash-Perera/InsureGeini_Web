@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { addStaff } from "@/services/staff";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 const staffTypes = [
@@ -35,16 +35,14 @@ const staffRegistrationSchema = z.object({
     .min(1, "Email field cannot be empty")
     .email("Please enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters long"),
-  /* .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-      "Password must contain at least one uppercase letter, one lowercase letter, one number and one special character"
-    ) */ mobileNumber: z.string().min(10, "Please enter a valid mobile number"),
+  mobileNumber: z.string().min(10, "Please enter a valid mobile number"),
   address: z.string().min(1, "Address field cannot be empty"),
   role: z.string().min(["staff", "value"], "Please select a staff type"),
 });
 
 const StaffRegistration = ({ setIsOpen }) => {
   const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const staffRegistrationForm = useForm({
     resolver: zodResolver(staffRegistrationSchema),
@@ -63,7 +61,8 @@ const StaffRegistration = ({ setIsOpen }) => {
       try {
         const response = await addStaff(data);
         toast.success("Staff added successfully");
-        staffRegistrationForm.reset;
+        queryClient.invalidateQueries({ queryKey: ["staff"] });
+        staffRegistrationForm.reset();
         setLoading(false);
         setIsOpen(false);
         return response;

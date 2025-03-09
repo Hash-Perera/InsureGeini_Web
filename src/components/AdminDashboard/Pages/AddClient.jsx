@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/select";
 import policyData from "../../Registrations/policies.json";
 import VehicleRegistration from "@/components/Registrations/VehicleRegistration";
+import { Loader } from "lucide-react";
 
 const imageFileSchema = z
   .instanceof(File)
@@ -63,8 +64,8 @@ const AddClient = () => {
   const [loading, setLoading] = useState(false);
   const [nicImage, setNicImage] = useState(null);
   const [drivingLicenseImage, setDrivingLicenseImage] = useState(null);
-  const [isCustomerRegistered, setIsCustomerRegistered] = useState(true);
-  const [userId, setUserId] = useState("67c975160782d8671081d73e");
+  const [isCustomerRegistered, setIsCustomerRegistered] = useState(false);
+  const [userId, setUserId] = useState(null);
 
   const clientRegistrationForm = useForm({
     resolver: zodResolver(clientRegistrationSchema),
@@ -91,12 +92,14 @@ const AddClient = () => {
         const response = await addCustomer(data);
         toast.success("Customer added successfully");
         setIsCustomerRegistered(true); // Set state to true to show vehicle registration form
-        setUserId(response.data.userId);
+        clientRegistrationForm.reset();
+        setUserId(response.userId);
         setLoading(false);
+        console.log(response);
         return response;
       } catch (error) {
         setLoading(false);
-        toast.error("Error adding customer");
+        // toast.error("Error adding customer");
       }
     },
   });
@@ -129,260 +132,294 @@ const AddClient = () => {
 
   return (
     <div className="max-w-4xl space-y-4 ">
-      <Form {...clientRegistrationForm}>
-        <form
-          className="p-3 space-y-4 bg-gray-100 rounded-lg "
-          onSubmit={clientRegistrationForm.handleSubmit(onSubmit)}
-        >
-          {/* policy type select */}
-          <FormField
-            control={clientRegistrationForm.control}
-            name="inusrancePolicy"
-            render={({ field }) => (
-              <FormItem>
-                <Label htmlFor="inusrancePolicy">Insurance Policy</Label>
-                <FormControl>
-                  <Select
-                    id="inusrancePolicy"
-                    value={field.value} // ✅ Ensure the selected value is managed by React Hook Form
-                    onValueChange={field.onChange} // ✅ Handle changes properly
-                    className="w-full max-w-md"
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select an insurance policy">
-                        {policyData?.insurance_policies?.find(
-                          (policy) => policy.title === field.value
-                        )?.title || "Select an insurance policy"}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Insurance Policies</SelectLabel>
-                        {policyData?.insurance_policies?.map((policy) => (
-                          <SelectItem key={policy.index} value={policy.title}>
-                            <div className="flex flex-col gap-1">
-                              <p className="text-sm font-medium">
-                                {policy.title}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                {policy.description}
-                              </p>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Name & NIC Row */}
-          <div className="grid grid-cols-2 gap-2">
-            <FormField
-              control={clientRegistrationForm.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <Label htmlFor="name">Full Name</Label>
-                  <FormControl>
-                    <Input id="name" {...field} className="max-w-md" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={clientRegistrationForm.control}
-              name="nicNo"
-              render={({ field }) => (
-                <FormItem>
-                  <Label htmlFor="nicNo">NIC</Label>
-                  <FormControl>
-                    <Input id="nicNo" {...field} className="max-w-md" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+      {!isCustomerRegistered && !userId && (
+        <>
+          <div>
+            <h1 className="text-2xl font-semibold">Add Client</h1>
+            <p className="text-sm text-gray-500">
+              Please fill in the details to add a new client
+            </p>
           </div>
-
-          {/* Email & Mobile Number */}
-          <div className="grid grid-cols-2 gap-2">
-            <FormField
-              control={clientRegistrationForm.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <Label htmlFor="email">Email</Label>
-                  <FormControl>
-                    <Input id="email" {...field} className="max-w-md" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={clientRegistrationForm.control}
-              name="mobileNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <Label htmlFor="mobileNumber">Mobile Number</Label>
-                  <FormControl>
-                    <Input id="mobileNumber" {...field} className="max-w-md" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          {/* Address & DOB */}
-          <div className="grid grid-cols-2 gap-2">
-            <FormField
-              control={clientRegistrationForm.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <Label htmlFor="address">Address</Label>
-                  <FormControl>
-                    <Input id="address" {...field} className="max-w-md" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={clientRegistrationForm.control}
-              name="dob"
-              render={({ field }) => (
-                <FormItem>
-                  <Label htmlFor="dob">Date of Birth</Label>
-                  <FormControl>
-                    <Input
-                      id="dob"
-                      type="date"
-                      {...field}
-                      className="max-w-md"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          {/* Insurance Policy & Driving License */}
-          <div className="grid grid-cols-2 gap-2">
-            <FormField
-              control={clientRegistrationForm.control}
-              name="insuranceId"
-              render={({ field }) => (
-                <FormItem>
-                  <Label htmlFor="insuranceId">Insurance ID</Label>
-                  <FormControl>
-                    <Input id="insuranceId" {...field} className="max-w-md" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={clientRegistrationForm.control}
-              name="drivingLicenseNo"
-              render={({ field }) => (
-                <FormItem>
-                  <Label htmlFor="drivingLicenseNo">Driving License No</Label>
-                  <FormControl>
-                    <Input
-                      id="drivingLicenseNo"
-                      {...field}
-                      className="max-w-md"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          {/* Image Upload Fields */}
-          <div className="grid grid-cols-2 gap-2">
-            <FormItem>
-              <Label>NIC Image</Label>
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={(e) => handleImageUpload(e, "nicImage")}
-              />
-              {nicImage && (
-                <p className="text-sm text-gray-500">{nicImage[0]?.name}</p>
-              )}
-              <FormMessage
-                error={clientRegistrationForm?.formState?.errors?.nicImage}
-              />
-            </FormItem>
-
-            <FormItem>
-              <Label>Driving License Image</Label>
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={(e) => handleImageUpload(e, "drivingLicenseImage")}
-              />
-              {drivingLicenseImage && (
-                <p className="text-sm text-gray-500">
-                  {drivingLicenseImage[0]?.name}
-                </p>
-              )}
-              <FormMessage
-                error={
-                  clientRegistrationForm?.formState?.errors?.drivingLicenseImage
-                }
-              />
-            </FormItem>
-          </div>
-
-          {/* Password & Confirm Password */}
-          <div className="grid grid-cols-4 gap-2">
-            <div className="col-span-3 ">
+          <Form {...clientRegistrationForm}>
+            <form
+              className="p-3 space-y-4 bg-gray-100 rounded-lg "
+              onSubmit={clientRegistrationForm.handleSubmit(onSubmit)}
+            >
+              {/* policy type select */}
               <FormField
                 control={clientRegistrationForm.control}
-                name="password"
+                name="inusrancePolicy"
                 render={({ field }) => (
                   <FormItem>
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="inusrancePolicy">Insurance Policy</Label>
                     <FormControl>
-                      <Input
-                        id="password"
-                        type="password"
-                        {...field}
-                        className="max-w-md"
-                      />
+                      <Select
+                        id="inusrancePolicy"
+                        value={field.value} // ✅ Ensure the selected value is managed by React Hook Form
+                        onValueChange={field.onChange} // ✅ Handle changes properly
+                        className="w-full max-w-md"
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select an insurance policy">
+                            {policyData?.insurance_policies?.find(
+                              (policy) => policy.title === field.value
+                            )?.title || "Select an insurance policy"}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Insurance Policies</SelectLabel>
+                            {policyData?.insurance_policies?.map((policy) => (
+                              <SelectItem
+                                key={policy.index}
+                                value={policy.title}
+                              >
+                                <div className="flex flex-col gap-1">
+                                  <p className="text-sm font-medium">
+                                    {policy.title}
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    {policy.description}
+                                  </p>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            </div>
-          </div>
 
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            className="w-[200px] h-9 btn-primary"
-            disabled={loading}
-          >
-            Register
-          </Button>
-        </form>
-      </Form>
+              {/* Name & NIC Row */}
+              <div className="grid grid-cols-2 gap-2">
+                <FormField
+                  control={clientRegistrationForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <Label htmlFor="name">Full Name</Label>
+                      <FormControl>
+                        <Input id="name" {...field} className="max-w-md" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={clientRegistrationForm.control}
+                  name="nicNo"
+                  render={({ field }) => (
+                    <FormItem>
+                      <Label htmlFor="nicNo">NIC</Label>
+                      <FormControl>
+                        <Input id="nicNo" {...field} className="max-w-md" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Email & Mobile Number */}
+              <div className="grid grid-cols-2 gap-2">
+                <FormField
+                  control={clientRegistrationForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <Label htmlFor="email">Email</Label>
+                      <FormControl>
+                        <Input id="email" {...field} className="max-w-md" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={clientRegistrationForm.control}
+                  name="mobileNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <Label htmlFor="mobileNumber">Mobile Number</Label>
+                      <FormControl>
+                        <Input
+                          id="mobileNumber"
+                          {...field}
+                          className="max-w-md"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Address & DOB */}
+              <div className="grid grid-cols-2 gap-2">
+                <FormField
+                  control={clientRegistrationForm.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <Label htmlFor="address">Address</Label>
+                      <FormControl>
+                        <Input id="address" {...field} className="max-w-md" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={clientRegistrationForm.control}
+                  name="dob"
+                  render={({ field }) => (
+                    <FormItem>
+                      <Label htmlFor="dob">Date of Birth</Label>
+                      <FormControl>
+                        <Input
+                          id="dob"
+                          type="date"
+                          {...field}
+                          className="max-w-md"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Insurance Policy & Driving License */}
+              <div className="grid grid-cols-2 gap-2">
+                <FormField
+                  control={clientRegistrationForm.control}
+                  name="insuranceId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <Label htmlFor="insuranceId">Insurance ID</Label>
+                      <FormControl>
+                        <Input
+                          id="insuranceId"
+                          {...field}
+                          className="max-w-md"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={clientRegistrationForm.control}
+                  name="drivingLicenseNo"
+                  render={({ field }) => (
+                    <FormItem>
+                      <Label htmlFor="drivingLicenseNo">
+                        Driving License No
+                      </Label>
+                      <FormControl>
+                        <Input
+                          id="drivingLicenseNo"
+                          {...field}
+                          className="max-w-md"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Image Upload Fields */}
+              <div className="grid grid-cols-2 gap-2">
+                <FormItem>
+                  <Label>NIC Image</Label>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, "nicImage")}
+                  />
+                  {nicImage && (
+                    <p className="text-sm text-gray-500">{nicImage[0]?.name}</p>
+                  )}
+                  <FormMessage
+                    error={clientRegistrationForm?.formState?.errors?.nicImage}
+                  />
+                </FormItem>
+
+                <FormItem>
+                  <Label>Driving License Image</Label>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      handleImageUpload(e, "drivingLicenseImage")
+                    }
+                  />
+                  {drivingLicenseImage && (
+                    <p className="text-sm text-gray-500">
+                      {drivingLicenseImage[0]?.name}
+                    </p>
+                  )}
+                  <FormMessage
+                    error={
+                      clientRegistrationForm?.formState?.errors
+                        ?.drivingLicenseImage
+                    }
+                  />
+                </FormItem>
+              </div>
+
+              {/* Password & Confirm Password */}
+              <div className="grid grid-cols-4 gap-2">
+                <div className="col-span-3 ">
+                  <FormField
+                    control={clientRegistrationForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <Label htmlFor="password">Password</Label>
+                        <FormControl>
+                          <Input
+                            id="password"
+                            type="password"
+                            {...field}
+                            className="max-w-md"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                className="w-[200px] h-9 btn-primary"
+                disabled={loading}
+              >
+                {loading ? (
+                  <Loader className="w-6 h-6 animate-spin" />
+                ) : (
+                  "Register"
+                )}
+              </Button>
+            </form>
+          </Form>
+        </>
+      )}
 
       {/* Show Vehicle Registration Form */}
       {isCustomerRegistered && userId && (
-        <VehicleRegistration userId={userId} />
+        <VehicleRegistration
+          userId={userId}
+          setUserId={setUserId}
+          setIsCustomerRegistered={setIsCustomerRegistered}
+        />
       )}
     </div>
   );

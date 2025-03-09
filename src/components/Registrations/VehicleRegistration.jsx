@@ -25,6 +25,7 @@ import policyData from "@/components/Registrations/policies.json";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { addVehicle } from "@/services/vehicle";
+import { Loader } from "lucide-react";
 
 // Vehicle Registration Schema
 const vehicleRegistrationSchema = z.object({
@@ -62,7 +63,11 @@ const vehicleRegistrationSchema = z.object({
     .refine((file) => file?.size > 0, "Number plate back image is required"),
 });
 
-const VehicleRegistration = ({ userId }) => {
+const VehicleRegistration = ({
+  userId,
+  setUserId,
+  setIsCustomerRegistered,
+}) => {
   const [loading, setLoading] = useState(false);
 
   const vehicleRegistrationForm = useForm({
@@ -87,27 +92,35 @@ const VehicleRegistration = ({ userId }) => {
     },
   });
 
-  const { setValue } = vehicleRegistrationForm;
+  const { setValue, clearErrors } = vehicleRegistrationForm;
 
   // Image upload handler
   const handleImageUpload = (e, type) => {
     const file = e.target.files[0];
     if (type === "insuranceCardImageFront") {
       setValue("insuranceCardImageFront", file);
+      clearErrors("insuranceCardImageFront");
     } else if (type === "insuranceCardImageBack") {
       setValue("insuranceCardImageBack", file);
+      clearErrors("insuranceCardImageBack");
     } else if (type === "vehiclePhotosFront") {
       setValue("vehiclePhotosFront", file);
+      clearErrors("vehiclePhotosFront");
     } else if (type === "vehiclePhotosBack") {
       setValue("vehiclePhotosBack", file);
+      clearErrors("vehiclePhotosBack");
     } else if (type === "vehiclePhotosLeft") {
       setValue("vehiclePhotosLeft", file);
+      clearErrors("vehiclePhotosLeft");
     } else if (type === "vehiclePhotosRight") {
       setValue("vehiclePhotosRight", file);
+      clearErrors("vehiclePhotosRight");
     } else if (type === "numberPlateImageFront") {
       setValue("numberPlateImageFront", file);
+      clearErrors("numberPlateImageFront");
     } else if (type === "numberPlateImageBack") {
       setValue("numberPlateImageBack", file);
+      clearErrors("numberPlateImageBack");
     }
   };
 
@@ -116,6 +129,7 @@ const VehicleRegistration = ({ userId }) => {
       try {
         const response = await addVehicle(data);
         toast.success("Vehicle added successfully");
+        vehicleRegistrationForm.reset();
         setLoading(false);
         return response;
       } catch (error) {
@@ -139,9 +153,27 @@ const VehicleRegistration = ({ userId }) => {
     mutation.mutate(formData);
   };
 
+  const addAnotherClient = () => {
+    setIsCustomerRegistered(false);
+    setUserId(null);
+  };
+
   return (
     <div className="w-full ">
-      <h1 className="text-4xl font-semibold ">Vehicle Registration</h1>
+      <div className="flex items-center justify-between mb-4 ">
+        <div className="flex flex-col ">
+          <h1 className="text-2xl font-semibold">Add Vehicle</h1>
+          <p className="text-sm text-gray-500">
+            Please fill in the details to add a new Vehicle
+          </p>
+        </div>
+        <Button
+          onClick={addAnotherClient}
+          className="w-[200px] h-9 btn-primary"
+        >
+          Add Another Client
+        </Button>
+      </div>
       <Form {...vehicleRegistrationForm}>
         <form
           className="p-3 space-y-4 bg-gray-100 rounded-lg"
@@ -295,37 +327,51 @@ const VehicleRegistration = ({ userId }) => {
 
           {/* Upload Fields */}
           <div className="grid grid-cols-2 gap-2">
-            <FormItem>
-              <Label>Insurance Card Front</Label>
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  handleImageUpload(e, "insuranceCardImageFront")
-                }
-              />
-              <FormMessage
-                error={
-                  vehicleRegistrationForm.formState.errors?.vehiclePhotosFront
-                    ?.message
-                }
-              />
-            </FormItem>
+            <FormField
+              control={vehicleRegistrationForm.control}
+              name="insuranceCardImageFront"
+              render={({ field }) => (
+                <FormItem>
+                  <Label>Insurance Card Front</Label>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      handleImageUpload(e, "insuranceCardImageFront")
+                    }
+                  />
+                  <FormMessage
+                    error={
+                      vehicleRegistrationForm.formState.errors
+                        ?.vehiclePhotosFront?.message
+                    }
+                  />
+                </FormItem>
+              )}
+            />
 
-            <FormItem>
-              <Label>Insurance Card Back</Label>
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={(e) => handleImageUpload(e, "insuranceCardImageBack")}
-              />
-              <FormMessage
-                error={
-                  vehicleRegistrationForm.formState?.errors
-                    ?.insuranceCardImageBack
-                }
-              />
-            </FormItem>
+            <FormField
+              control={vehicleRegistrationForm.control}
+              name="insuranceCardImageBack"
+              render={({ field }) => (
+                <FormItem>
+                  <Label>Insurance Card Back</Label>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      handleImageUpload(e, "insuranceCardImageBack")
+                    }
+                  />
+                  <FormMessage
+                    error={
+                      vehicleRegistrationForm.formState?.errors
+                        ?.insuranceCardImageBack
+                    }
+                  />
+                </FormItem>
+              )}
+            />
           </div>
 
           {/* Vehicle Photos */}
@@ -430,7 +476,11 @@ const VehicleRegistration = ({ userId }) => {
             className="w-[200px] h-9 btn-primary"
             disabled={loading}
           >
-            Register Vehicle
+            {loading ? (
+              <Loader className="w-5 h-5 animate-spin" />
+            ) : (
+              "Register Vehicle"
+            )}
           </Button>
         </form>
       </Form>

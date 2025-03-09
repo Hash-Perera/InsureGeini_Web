@@ -8,3 +8,12 @@ export const addCustomer = async (data) => {
     throw error;
   }
 };
+
+export const getAllCustomers = async () => {
+  try {
+    const response = await axiosInstance.get("/user/getAllCustomers");
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

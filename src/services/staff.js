@@ -8,3 +8,21 @@ export const addStaff = async (data) => {
     throw error;
   }
 };
+
+export const getStaff = async () => {
+  try {
+    const response = await axiosInstance.get("/user/getAllStaff");
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteUser = async (id) => {
+  try {
+    const response = await axiosInstance.delete(`/user/deleteUser/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
