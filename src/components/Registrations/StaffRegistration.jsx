@@ -20,54 +20,55 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { addStaff } from "@/services/staff";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 const staffTypes = [
-  { value: "admin", label: "Admin" },
-  { value: "staff", label: "Staff" },
+  { value: "67c7eb72b82959d184a0cd08", label: "Staff" },
+  //{ value: "admin", label: "Admin" },
 ];
 
 const staffRegistrationSchema = z.object({
-  firstName: z.string().min(1, "First name field cannot be empty"),
-  lastName: z.string().min(1, "Last name field cannot be empty"),
-  nic: z.string().min(1, "NIC field cannot be empty"),
-  staffType: z.string().min(["admin", "value"], "Please select a staff type"),
+  name: z.string().min(1, "Name field cannot be empty"),
   email: z
     .string()
     .min(1, "Email field cannot be empty")
     .email("Please enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters long"),
-  confirmPassword: z
-    .string()
-    .min(8, "Password must be at least 8 characters long"),
+  mobileNumber: z.string().min(10, "Please enter a valid mobile number"),
+  address: z.string().min(1, "Address field cannot be empty"),
+  role: z.string().min(["staff", "value"], "Please select a staff type"),
 });
 
-const StaffRegistration = () => {
+const StaffRegistration = ({ setIsOpen }) => {
   const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const staffRegistrationForm = useForm({
     resolver: zodResolver(staffRegistrationSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      nic: "",
+      name: "",
       email: "",
       password: "",
-      confirmPassword: "",
-      staffType: staffTypes[0].value,
+      role: staffTypes[0].value,
+      mobileNumber: "",
+      address: "",
     },
   });
 
   const mutation = useMutation({
-    mutationFn: addStaff,
-    onSuccess: () => {
-      showSuccessToast(toast, "Staff added successfully");
-    },
-    onError: (error, variables, context) => {
-      showErrorToast(
-        toast,
-        error?.response?.data?.message || "An unexpected error occurred"
-      );
+    mutationFn: async (data) => {
+      try {
+        const response = await addStaff(data);
+        toast.success("Staff added successfully");
+        queryClient.invalidateQueries({ queryKey: ["staff"] });
+        staffRegistrationForm.reset();
+        setLoading(false);
+        setIsOpen(false);
+        return response;
+      } catch (error) {
+        toast.error("Error adding staff");
+      }
     },
   });
 
@@ -90,7 +91,12 @@ const StaffRegistration = () => {
             <FormItem>
               <Label htmlFor="staffType">Staff Type</Label>
               <FormControl>
-                <Select {...field} id="staffType" className="w-full max-w-md">
+                <Select
+                  {...field}
+                  id="staffType"
+                  className="w-full max-w-md"
+                  defaultValue="67c7eb72b82959d184a0cd08"
+                >
                   <SelectTrigger>
                     <SelectValue>
                       {
@@ -112,38 +118,21 @@ const StaffRegistration = () => {
             </FormItem>
           )}
         />
-        {/* First & Last Name Row */}
+        {/*Name Row and Email */}
         <div className="grid grid-cols-2 gap-2 ">
           <FormField
             control={staffRegistrationForm.control}
-            name="firstName"
+            name="name"
             render={({ field }) => (
               <FormItem>
-                <Label htmlFor="firstName">First Name</Label>
+                <Label htmlFor="name">Name</Label>
                 <FormControl>
-                  <Input id="firstName" {...field} className="max-w-md" />
+                  <Input id="name" {...field} className="max-w-md" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <FormField
-            control={staffRegistrationForm.control}
-            name="lastName"
-            render={({ field }) => (
-              <FormItem>
-                <Label htmlFor="lastName">Last Name</Label>
-                <FormControl>
-                  <Input id="lastName" {...field} className="max-w-md" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-2 ">
-          {/* Email */}
           <FormField
             control={staffRegistrationForm.control}
             name="email"
@@ -157,14 +146,36 @@ const StaffRegistration = () => {
               </FormItem>
             )}
           />
+        </div>
+
+        <div className="grid grid-cols-2 gap-2 ">
+          {/* Address and phone number */}
           <FormField
             control={staffRegistrationForm.control}
-            name="nic"
+            name="address"
             render={({ field }) => (
               <FormItem>
-                <Label htmlFor="nic">NIC</Label>
+                <Label htmlFor="address">Address</Label>
                 <FormControl>
-                  <Input id="nic" {...field} className="max-w-md" />
+                  <Input id="address" {...field} className="max-w-md" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={staffRegistrationForm.control}
+            name="mobileNumber"
+            render={({ field }) => (
+              <FormItem>
+                <Label htmlFor="mobileNumber">Mobile Number</Label>
+                <FormControl>
+                  <Input
+                    id="mobileNumber"
+                    type="tel"
+                    {...field}
+                    className="w-full max-w-md"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -173,43 +184,27 @@ const StaffRegistration = () => {
         </div>
 
         {/* Password & Confirm Password Row */}
-        <div className="grid grid-cols-2 gap-2 pb-4 ">
-          <FormField
-            control={staffRegistrationForm.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <Label htmlFor="password">Password</Label>
-                <FormControl>
-                  <Input
-                    id="password"
-                    type="password"
-                    {...field}
-                    className="max-w-md"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={staffRegistrationForm.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <FormControl>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    {...field}
-                    className="max-w-md"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <div className="grid grid-cols-4 gap-2 pb-4 ">
+          <div className="col-span-3 ">
+            <FormField
+              control={staffRegistrationForm.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <Label htmlFor="password">Password</Label>
+                  <FormControl>
+                    <Input
+                      id="password"
+                      type="password"
+                      {...field}
+                      className="max-w-md"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
 
         {/* Submit Button */}

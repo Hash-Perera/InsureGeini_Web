@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 
 function RootLayout() {
   const navigate = useNavigate();
-  const token = localStorage.getItem("authToken");
+  const token = localStorage.getItem("token");
 
   /* useEffect(() => {
     if (token) {

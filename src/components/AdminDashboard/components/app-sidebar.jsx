@@ -57,7 +57,7 @@ const data = {
         },
         {
           title: "Clients",
-          url: "",
+          url: "/admin/clients",
         },
       ],
     },
