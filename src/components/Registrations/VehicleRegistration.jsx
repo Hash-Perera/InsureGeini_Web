@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { addVehicle } from "@/services/vehicle";
 import { Loader } from "lucide-react";
+import { useParams } from "react-router-dom";
 
 // Vehicle Registration Schema
 const vehicleRegistrationSchema = z.object({
@@ -68,8 +69,9 @@ const VehicleRegistration = ({
   setUserId,
   setIsCustomerRegistered,
 }) => {
+  const { id } = useParams();
   const [loading, setLoading] = useState(false);
-
+  console.log(userId);
   const vehicleRegistrationForm = useForm({
     resolver: zodResolver(vehicleRegistrationSchema),
     defaultValues: {
@@ -167,12 +169,14 @@ const VehicleRegistration = ({
             Please fill in the details to add a new Vehicle
           </p>
         </div>
-        <Button
-          onClick={addAnotherClient}
-          className="w-[200px] h-9 btn-primary"
-        >
-          Add Another Client
-        </Button>
+        {!id && (
+          <Button
+            onClick={addAnotherClient}
+            className="w-[200px] h-9 btn-primary"
+          >
+            Add Another Client
+          </Button>
+        )}
       </div>
       <Form {...vehicleRegistrationForm}>
         <form

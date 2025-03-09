@@ -8,3 +8,12 @@ export const addVehicle = async (data) => {
     throw error;
   }
 };
+
+export const deleteVehicle = async (id) => {
+  try {
+    const response = await axiosInstance.delete(`/vehicle/deleteVehicle/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

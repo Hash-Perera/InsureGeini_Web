@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -27,6 +27,7 @@ import {
 import policyData from "../../Registrations/policies.json";
 import VehicleRegistration from "@/components/Registrations/VehicleRegistration";
 import { Loader } from "lucide-react";
+import { useParams } from "react-router-dom";
 
 const imageFileSchema = z
   .instanceof(File)
@@ -61,6 +62,7 @@ const clientRegistrationSchema = z.object({
 });
 
 const AddClient = () => {
+  const { id } = useParams();
   const [loading, setLoading] = useState(false);
   const [nicImage, setNicImage] = useState(null);
   const [drivingLicenseImage, setDrivingLicenseImage] = useState(null);
@@ -132,7 +134,7 @@ const AddClient = () => {
 
   return (
     <div className="max-w-4xl space-y-4 ">
-      {!isCustomerRegistered && !userId && (
+      {!isCustomerRegistered && !userId && !id && (
         <>
           <div>
             <h1 className="text-2xl font-semibold">Add Client</h1>
@@ -414,13 +416,14 @@ const AddClient = () => {
       )}
 
       {/* Show Vehicle Registration Form */}
-      {isCustomerRegistered && userId && (
-        <VehicleRegistration
-          userId={userId}
-          setUserId={setUserId}
-          setIsCustomerRegistered={setIsCustomerRegistered}
-        />
-      )}
+      {(isCustomerRegistered && userId) ||
+        (id && (
+          <VehicleRegistration
+            userId={userId || id}
+            setUserId={setUserId}
+            setIsCustomerRegistered={setIsCustomerRegistered}
+          />
+        ))}
     </div>
   );
 };
