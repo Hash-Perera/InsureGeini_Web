@@ -44,7 +44,6 @@ const Staff = () => {
   const deleteStaff = useMutation({
     mutationFn: async (id) => {
       try {
-        console.log("Deleting staff with ID:", id);
         const response = await deleteUser(id);
         queryClient.invalidateQueries({ queryKey: ["staff"] });
         return response;

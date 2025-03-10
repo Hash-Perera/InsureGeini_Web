@@ -15,10 +15,10 @@ import { MoreHorizontal } from "lucide-react";
 
 const columns = [
   {
-    accessorKey: "userId", // Assuming 'userId' is available or you can use '_id'
+    accessorKey: "_id", // Assuming 'userId' is available or you can use '_id'
     header: "User ID",
     cell: ({ row }) => (
-      <div className="font-medium text-blue-600">{row.getValue("userId")}</div>
+      <div className="font-medium text-blue-600">{row.getValue("_id")}</div>
     ),
   },
   {
@@ -81,36 +81,7 @@ const columns = [
       <div className="font-medium">{row.getValue("inusrancePolicy")}</div>
     ),
   },
-  {
-    accessorKey: "nicImage",
-    header: "NIC Image",
-    cell: ({ row }) => (
-      <div className="font-medium">
-        <a
-          href={row.getValue("nicImage")}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          View NIC Image
-        </a>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "drivingLicenseImage",
-    header: "Driving License Image",
-    cell: ({ row }) => (
-      <div className="font-medium">
-        <a
-          href={row.getValue("drivingLicenseImage")}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          View Driving License
-        </a>
-      </div>
-    ),
-  },
+
   {
     id: "actions",
     enableHiding: false,
@@ -139,14 +110,15 @@ const columns = [
               Copy Insurance Policy
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View Details</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link to={`/admin/clients/${record._id}`}>View Details</Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
     },
   },
 ];
-
 const Clients = () => {
   const { data: customerData } = useQuery({
     queryKey: ["customers"],

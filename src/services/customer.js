@@ -17,3 +17,12 @@ export const getAllCustomers = async () => {
     throw error;
   }
 };
+
+export const getCustomerById = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/user/getCustomerById/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
