@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import policyData from "./policies.json";
+import policyData from "./policyData.js";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { addCustomer } from "@/services/customer";

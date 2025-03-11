@@ -24,7 +24,7 @@ import {
   SelectLabel,
   SelectValue,
 } from "@/components/ui/select";
-import policyData from "../../Registrations/policies.json";
+import { policies } from "../../Registrations/policyData.js";
 import VehicleRegistration from "@/components/Registrations/VehicleRegistration";
 import { Loader } from "lucide-react";
 import { useParams } from "react-router-dom";
@@ -144,7 +144,7 @@ const AddClient = () => {
           </div>
           <Form {...clientRegistrationForm}>
             <form
-              className="p-3 space-y-4 bg-gray-100 rounded-lg "
+              className="p-3 space-y-4 rounded-lg bg-gray-50 "
               onSubmit={clientRegistrationForm.handleSubmit(onSubmit)}
             >
               {/* policy type select */}
@@ -163,7 +163,7 @@ const AddClient = () => {
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select an insurance policy">
-                            {policyData?.insurance_policies?.find(
+                            {policies?.find(
                               (policy) => policy.title === field.value
                             )?.title || "Select an insurance policy"}
                           </SelectValue>
@@ -171,7 +171,7 @@ const AddClient = () => {
                         <SelectContent>
                           <SelectGroup>
                             <SelectLabel>Insurance Policies</SelectLabel>
-                            {policyData?.insurance_policies?.map((policy) => (
+                            {policies?.map((policy) => (
                               <SelectItem
                                 key={policy.index}
                                 value={policy.title}
