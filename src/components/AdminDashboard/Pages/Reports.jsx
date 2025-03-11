@@ -39,9 +39,7 @@ const columns = [
     cell: ({ row }) => {
       return (
         <div className="font-medium text-blue-600">
-          <a href={`/admin/reports/${row.getValue("userId")}`}>
-            {row.getValue("userId")}
-          </a>
+          {row.getValue("userId")}
         </div>
       );
     },
@@ -80,7 +78,13 @@ const columns = [
     header: "Decision Report",
     cell: ({ row }) => (
       <div className="max-w-xs truncate" title={row.getValue("decisionReport")}>
-        {row.getValue("decisionReport")}
+        <a
+          href={`${row.getValue("decisionReport")}`}
+          target="_blank"
+          className="text-blue-600 underline"
+        >
+          Decision Report
+        </a>
       </div>
     ),
   },
@@ -107,7 +111,13 @@ const columns = [
     header: "Incident Report",
     cell: ({ row }) => (
       <div className="max-w-xs truncate" title={row.getValue("incidentReport")}>
-        {row.getValue("incidentReport")}
+        <a
+          href={`${row.getValue("incidentReport")}`}
+          target="_blank"
+          className="text-blue-600 underline"
+        >
+          Incident Report
+        </a>
       </div>
     ),
   },
