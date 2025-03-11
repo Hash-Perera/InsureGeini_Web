@@ -30,12 +30,12 @@ import { toast } from "sonner";
 
 const ClientView = () => {
   const { id } = useParams();
+  const queryClient = useQueryClient();
   const { data: customerData } = useQuery({
     queryKey: ["customer", id],
     queryFn: async () => {
       try {
         const response = await getCustomerById(id);
-        toast.success("Customer details loaded successfully");
         return response;
       } catch (error) {
         console.error("Error fetching all customers:", error.message);
@@ -45,6 +45,25 @@ const ClientView = () => {
     staleTime: Infinity,
     retry: false,
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      try {
+        const response = await deleteVehicle(id);
+        queryClient.invalidateQueries({ queryKey: ["customer", id] });
+        toast.success("Vehicle deleted successfully");
+        return response;
+      } catch (error) {
+        console.error("Error deleting staff:", error.message);
+        throw error;
+      }
+    },
+  });
+
+  const handleDelete = (id) => {
+    console.log("Delete vehicle with ID:", id);
+    deleteMutation.mutate(id);
+  };
 
   return (
     <div className="flex flex-col w-full gap-8">
@@ -213,16 +232,17 @@ const ClientView = () => {
         </div>
       </div>
 
-      <VehicleDetailsView vehicles={customerData?.vehicles} />
+      <VehicleDetailsView
+        vehicles={customerData?.vehicles}
+        handleDelete={handleDelete}
+      />
     </div>
   );
 };
 
 export default ClientView;
 
-const VehicleDetailsView = ({ vehicles }) => {
-  const { id } = useParams();
-  const queryClient = useQueryClient();
+const VehicleDetailsView = ({ vehicles, handleDelete }) => {
   const [expandedVehicles, setExpandedVehicles] = useState({});
 
   if (!vehicles || vehicles.length === 0) {
@@ -242,24 +262,6 @@ const VehicleDetailsView = ({ vehicles }) => {
       ...prev,
       [id]: !prev[id],
     }));
-  };
-
-  /*   const deleteMutation = useMutation({
-    mutationFn: async (id) => {
-      try {
-        const response = await deleteVehicle(id);
-        queryClient.invalidateQueries({ queryKey: ["customer", id] });
-        toast.success("Vehicle deleted successfully");
-        return response;
-      } catch (error) {
-        console.error("Error deleting staff:", error.message);
-        throw error;
-      }
-    },
-  }); */
-
-  const handleDelete = (id) => {
-    // deleteMutation.mutate(id);
   };
 
   return (
