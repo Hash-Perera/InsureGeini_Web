@@ -8,11 +8,11 @@ import {
 import { Download } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+import jsPDF from "jspdf"; 
+import autoTable from "jspdf-autotable"; 
 import { CalendarIcon } from "lucide-react";
-
-import FeedbackDetailsDialog from "./FeedbackDetailDialog";
+import Swal from "sweetalert2";
+import FeedbackDetailsDialog from "./FeedbackDetailDialog"; 
 
 import {
   PieChart,
@@ -235,7 +235,7 @@ export const Feedback = () => {
 
   const columns = [
     {
-      accessorKey: "InsuranceId",
+      accessorKey: "InsuranceId", 
       header: " name",
       cell: ({ row }) => (
         <div className="font-medium">
@@ -367,7 +367,7 @@ export const Feedback = () => {
       const feedbackList = response.data.data;
       const updatedFeedbackData = feedbackList.map((feedback) => ({
         ...feedback,
-        InsuranceId: feedback.userId?.insuranceId || "Unknown",
+        InsuranceId: feedback.userId?.insuranceId || "Unknown", 
       }));
 
       setTimeout(() => {
@@ -849,9 +849,35 @@ export const Feedback = () => {
                       );
 
                       // Show success message
+                      Swal.fire({
+                        title: "✅ Download Complete!",
+                        text: "Your feedback by sentiment report has been successfully generated and saved.",
+                        icon: "success",
+                        background: "#fff",
+                        color: "#065f46",
+                        confirmButtonColor: "#059669",
+                        confirmButtonText: "Great!",
+                        showClass: {
+                          popup: "animate__animated animate__zoomIn",
+                        },
+                        hideClass: {
+                          popup: "animate__animated animate__fadeOutUp",
+                        },
+                      });
                     } catch (error) {
                       // Show error message
-                      console.error(error);
+                      Swal.fire({
+                        title: "❌ Validation Error",
+                        text: error.message,
+                        icon: "error",
+                        background: "#fee2e2",
+                        color: "#b91c1c",
+                        confirmButtonColor: "#dc2626",
+                        confirmButtonText: "Try Again",
+                        showClass: {
+                          popup: "animate__animated animate__shakeX",
+                        },
+                      });
                     }
                   })}
                 >
@@ -939,9 +965,37 @@ export const Feedback = () => {
                         startDate,
                         endDate
                       );
+
+                      // Show success message
+                      Swal.fire({
+                        title: "✅ Download Complete!",
+                        text: "Your feedback by category report has been successfully generated and saved.",
+                        icon: "success",
+                        background: "#fff",
+                        color: "#065f46",
+                        confirmButtonColor: "#059669",
+                        confirmButtonText: "Great!",
+                        showClass: {
+                          popup: "animate__animated animate__zoomIn",
+                        },
+                        hideClass: {
+                          popup: "animate__animated animate__fadeOutUp",
+                        },
+                      });
                     } catch (error) {
                       // Show error message
-                      console.error(error);
+                      Swal.fire({
+                        title: "❌ Validation Error",
+                        text: error.message,
+                        icon: "error",
+                        background: "#fee2e2",
+                        color: "#b91c1c",
+                        confirmButtonColor: "#dc2626",
+                        confirmButtonText: "Try Again",
+                        showClass: {
+                          popup: "animate__animated animate__shakeX",
+                        },
+                      });
                     }
                   })}
                 >
@@ -958,7 +1012,7 @@ export const Feedback = () => {
                       <BarChart
                         data={categoryBarData}
                         margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
-                        barCategoryGap={categoryBarData.length === 1 ? 0 : 30}
+                        barCategoryGap={categoryBarData.length === 1 ? 0 : 30} 
                         barGap={categoryBarData.length === 1 ? 0 : 10}
                       >
                         <CartesianGrid vertical={false} />
@@ -1003,9 +1057,35 @@ export const Feedback = () => {
                       );
 
                       // Show success message
+                      Swal.fire({
+                        title: "✅ Download Complete!",
+                        text: "Your Sentiment & Category report has been successfully generated and saved.",
+                        icon: "success",
+                        background: "#fff",
+                        color: "#065f46",
+                        confirmButtonColor: "#059669",
+                        confirmButtonText: "Great!",
+                        showClass: {
+                          popup: "animate__animated animate__zoomIn",
+                        },
+                        hideClass: {
+                          popup: "animate__animated animate__fadeOutUp",
+                        },
+                      });
                     } catch (error) {
                       // Show error message
-                      console.error(error);
+                      Swal.fire({
+                        title: "❌ Validation Error",
+                        text: error.message,
+                        icon: "error",
+                        background: "#fee2e2",
+                        color: "#b91c1c",
+                        confirmButtonColor: "#dc2626",
+                        confirmButtonText: "Try Again",
+                        showClass: {
+                          popup: "animate__animated animate__shakeX",
+                        },
+                      });
                     }
                   })}
                 >
@@ -1153,9 +1233,35 @@ export const Feedback = () => {
                         );
 
                         // Show success message
+                        Swal.fire({
+                          title: "✅ Download Complete!",
+                          text: "Your sentiment trends report has been successfully generated and saved.",
+                          icon: "success",
+                          background: "#fff",
+                          color: "#065f46",
+                          confirmButtonColor: "#059669",
+                          confirmButtonText: "Great!",
+                          showClass: {
+                            popup: "animate__animated animate__zoomIn",
+                          },
+                          hideClass: {
+                            popup: "animate__animated animate__fadeOutUp",
+                          },
+                        });
                       } catch (error) {
                         // Show error message
-                        console.error(error);
+                        Swal.fire({
+                          title: "❌ Validation Error",
+                          text: error.message,
+                          icon: "error",
+                          background: "#fee2e2",
+                          color: "#b91c1c",
+                          confirmButtonColor: "#dc2626",
+                          confirmButtonText: "Try Again",
+                          showClass: {
+                            popup: "animate__animated animate__shakeX",
+                          },
+                        });
                       }
                     })}
                   >
