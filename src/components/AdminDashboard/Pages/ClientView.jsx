@@ -22,6 +22,7 @@ import {
   Camera,
   Edit,
   SquarePlus,
+  ShieldPlus,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -324,9 +325,44 @@ const VehicleDetailsView = ({ vehicles, handleDelete }) => {
                       Insurance Policy
                     </h3>
                     <p className="text-base font-medium text-gray-800">
-                      {vehicle.insurancePolicyNo}
+                      {vehicle.insurancePolicy}
                     </p>
                   </div>
+                </div>
+
+                {/* Policy AdOns */}
+                <div className="flex flex-col gap-3 p-3 transition-all rounded-lg bg-gray-50 hover:bg-gray-100">
+                  <div className="flex items-start gap-3 ">
+                    <ShieldPlus className="w-5 h-5 text-indigo-500" />
+                    <h3 className="text-sm font-medium text-gray-500">
+                      Policy AdOns
+                    </h3>
+                  </div>
+
+                  {/* Loop through each category of policy add-ons */}
+                  {Object.entries(vehicle.policyAdOns).map(
+                    ([category, items]) =>
+                      items.length > 0 && (
+                        <div
+                          key={category}
+                          className="p-3 bg-white rounded-lg "
+                        >
+                          <h4 className="text-sm font-medium text-gray-600">
+                            {category.replace(/([A-Z])/g, " $1")}
+                          </h4>
+                          <ul className="pl-5 list-disc">
+                            {items.map((item, index) => (
+                              <li
+                                key={index}
+                                className="text-base font-medium text-gray-800"
+                              >
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )
+                  )}
                 </div>
 
                 {/* Engine Number */}
