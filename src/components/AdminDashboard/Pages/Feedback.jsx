@@ -8,11 +8,11 @@ import {
 import { Download } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import jsPDF from "jspdf"; 
-import autoTable from "jspdf-autotable"; 
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import { CalendarIcon } from "lucide-react";
 import Swal from "sweetalert2";
-import FeedbackDetailsDialog from "./FeedbackDetailDialog"; 
+import FeedbackDetailsDialog from "./FeedbackDetailDialog";
 
 import {
   PieChart,
@@ -139,83 +139,6 @@ const columns = [
   },
 ];
 
-/*   // Download Button Component
-  const DownloadButton = ({ data, filename, title }) => {
-    const [open, setOpen] = useState(false);
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
-    console.log("sentimentdata",data);
-    console.log("start date", startDate);
-    console.log("end date", endDate);
-  
-    const handleDownload = () => {
-      if (!startDate || !endDate) {
-        alert("Please select a date range.");
-        return;
-      }
-  
-      // Filter data based on selected date range
-      const filteredData = data.filter((item) => {
-        const itemDate = new Date(item.createdAt); // Ensure each data item has a 'createdAt' field
-        return itemDate >= new Date(startDate) && itemDate <= new Date(endDate);
-      });
-  
-      if (filteredData.length === 0) {
-        alert("No data found for the selected time range.");
-        return;
-      }
-  
-      // Convert data to CSV format
-      const csvContent =
-        "data:text/csv;charset=utf-8," +
-        Object.keys(filteredData[0]).join(",") + "\n" + // Headers
-        filteredData.map((row) => Object.values(row).join(",")).join("\n");
-  
-      // Create a Blob and trigger the download
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-      saveAs(blob, `${filename}-${format(new Date(), "yyyy-MM-dd")}.csv`);
-  
-      setOpen(false);
-    };
-    return (
-      <>
-        <Button variant="outline" className="mt-2" onClick={() => setOpen(true)}>
-          <Download className="mr-2" size={16} /> Download Report
-        </Button>
-  
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Select Time Range for {title}</DialogTitle>
-            </DialogHeader>
-            <div className="flex flex-col gap-4">
-              <label>
-                Start Date:
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="border p-2 w-full rounded"
-                />
-              </label>
-              <label>
-                End Date:
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="border p-2 w-full rounded"
-                />
-              </label>
-              <Button className="mt-4" onClick={handleDownload}>
-                Generate Report
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </>
-    );
-  }; */
 export const Feedback = () => {
   const [feedbackData, setFeedbackData] = useState([]);
   const [sentimentStats, setSentimentStats] = useState({});
@@ -235,7 +158,7 @@ export const Feedback = () => {
 
   const columns = [
     {
-      accessorKey: "InsuranceId", 
+      accessorKey: "InsuranceId",
       header: " name",
       cell: ({ row }) => (
         <div className="font-medium">
@@ -367,7 +290,7 @@ export const Feedback = () => {
       const feedbackList = response.data.data;
       const updatedFeedbackData = feedbackList.map((feedback) => ({
         ...feedback,
-        InsuranceId: feedback.userId?.insuranceId || "Unknown", 
+        InsuranceId: feedback.userId?.insuranceId || "Unknown",
       }));
 
       setTimeout(() => {
@@ -1012,7 +935,7 @@ export const Feedback = () => {
                       <BarChart
                         data={categoryBarData}
                         margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
-                        barCategoryGap={categoryBarData.length === 1 ? 0 : 30} 
+                        barCategoryGap={categoryBarData.length === 1 ? 0 : 30}
                         barGap={categoryBarData.length === 1 ? 0 : 10}
                       >
                         <CartesianGrid vertical={false} />
