@@ -33,6 +33,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import SharedDataTable from "../components/SharedDataTable";
+import axios from "axios";
+
 
 const chartConfig = {
   value: {
@@ -125,74 +127,30 @@ const columns = [
   },
 ];
 export const Feedback = () => {
-  const [feedbackData, setFeedbackData] = useState([
-    {
-      _id: 1,
-      userId: "User 1",
-      feedback: "Great service!",
-      sentiment: "Positive",
-      category: "CustomerService",
-    },
-    {
-      _id: 2,
-      userId: "User 2",
-      feedback: "The policy is too expensive.",
-      sentiment: "Negative",
-      category: "Policy",
-    },
-    {
-      _id: 3,
-      userId: "User 3",
-      feedback: "I'm happy with the claim process.",
-      sentiment: "Positive",
-      category: "Claim",
-    },
-    {
-      _id: 4,
-      userId: "User 4",
-      feedback: "Average service.",
-      sentiment: "Neutral",
-      category: "CustomerService",
-    },
-    {
-      _id: 5,
-      userId: "User 5",
-      feedback: "The policy is too expensive.",
-      sentiment: "Negative",
-      category: "Policy",
-    },
-    {
-      _id: 6,
-      userId: "User 6",
-      feedback: "Great service!",
-      sentiment: "Positive",
-      category: "CustomerService",
-    },
-    {
-      _id: 7,
-      userId: "User 7",
-      feedback: "The policy is too expensive.",
-      sentiment: "Negative",
-      category: "Policy",
-    },
-    {
-      _id: 8,
-      userId: "User 8",
-      feedback: "I'm happy with the claim process.",
-      sentiment: "Positive",
-      category: "Claim",
-    },
-  ]);
+  const [feedbackData, setFeedbackData] = useState([]);
   const [sentimentStats, setSentimentStats] = useState({});
+ 
 
-  /* useEffect(() => {
-    fetch("/api/feedback") // Replace with your API endpoint
-      .then((res) => res.json())
-      .then((data) => {
-        setFeedbackData(data);
-        calculateSentimentStats(data);
+  const fetchFeedbackData = async () => {
+    try {
+      const token =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NDg0NzJlYWUwZmI3Y2RiZjcxOTBmYSIsInJvbGUiOiJDdXN0b21lciIsImlhdCI6MTczOTIwMzY3MCwiZXhwIjoxNzQxNzk1NjcwfQ.v338cBSy53nmwp5DTSUQZqDw49LwKWjwSfCEuQIkZcc";
+      const response = await axios.get("http://localhost:8000/v1/feedback/all", {
+        headers: {
+          contentType: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
-  }, []); */
+      setFeedbackData(response.data.data);
+    } catch (error) {
+      console.error("Error fetching feedback data:", error);
+    }
+  };
+  
+  useEffect(() => {
+    fetchFeedbackData();
+  }, []);
+
   useEffect(() => {
     if (feedbackData.length > 0) {
       calculateSentimentStats(feedbackData);
