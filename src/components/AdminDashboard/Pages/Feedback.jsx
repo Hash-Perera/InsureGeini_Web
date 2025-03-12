@@ -9,6 +9,9 @@ import {
   XAxis,
   CartesianGrid,
   ResponsiveContainer,
+  AreaChart,
+   Area,
+   YAxis,
 } from "recharts";
 import {
   MessageSquareQuote,
@@ -131,6 +134,10 @@ export const Feedback = () => {
   const [feedbackData, setFeedbackData] = useState([]);
   const [sentimentStats, setSentimentStats] = useState({});
   const [loading, setLoading] = useState(true);
+  const sentimentTrendData = [
+    { month: "Jan", Positive: 10, Neutral: 5, Negative: 2 },
+    { month: "Feb", Positive: 12, Neutral: 4, Negative: 3 },
+  ];
  
 
   const fetchFeedbackData = async () => {
@@ -325,6 +332,15 @@ export const Feedback = () => {
           </CardContent>
         </Card>
       </div>
+      <ResponsiveContainer width="100%" height={300}>
+  <AreaChart data={sentimentTrendData}>
+    <YAxis />
+    <Area type="monotone" dataKey="Positive" stroke="#4caf50" fill="#4caf50" />
+    <Area type="monotone" dataKey="Neutral" stroke="#ffeb3b" fill="#ffeb3b" />
+    <Area type="monotone" dataKey="Negative" stroke="#f44336" fill="#f44336" />
+  </AreaChart>
+</ResponsiveContainer>;
+
 
       {/* Recent Feedback Table */}
       <div className="pt-3 rounded-xl">
