@@ -34,6 +34,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import SharedDataTable from "../components/SharedDataTable";
 import axios from "axios";
+import { set } from "date-fns";
 
 
 const chartConfig = {
@@ -129,10 +130,12 @@ const columns = [
 export const Feedback = () => {
   const [feedbackData, setFeedbackData] = useState([]);
   const [sentimentStats, setSentimentStats] = useState({});
+  const [loading, setLoading] = useState(true);
  
 
   const fetchFeedbackData = async () => {
     try {
+      setLoading(true);
       const token =
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NDg0NzJlYWUwZmI3Y2RiZjcxOTBmYSIsInJvbGUiOiJDdXN0b21lciIsImlhdCI6MTczOTIwMzY3MCwiZXhwIjoxNzQxNzk1NjcwfQ.v338cBSy53nmwp5DTSUQZqDw49LwKWjwSfCEuQIkZcc";
       const response = await axios.get("http://localhost:8000/v1/feedback/all", {
@@ -142,9 +145,12 @@ export const Feedback = () => {
         },
       });
       setFeedbackData(response.data.data);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching feedback data:", error);
+      
     }
+    setLoading(false)
   };
   
   useEffect(() => {
