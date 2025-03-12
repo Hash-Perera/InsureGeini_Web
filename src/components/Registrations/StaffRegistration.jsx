@@ -22,23 +22,12 @@ import {
 import { addStaff } from "@/services/staff";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { staffRegistrationSchema } from "@/constants/validationSchema";
 
 const staffTypes = [
   { value: "67c7eb72b82959d184a0cd08", label: "Staff" },
   //{ value: "admin", label: "Admin" },
 ];
-
-const staffRegistrationSchema = z.object({
-  name: z.string().min(1, "Name field cannot be empty"),
-  email: z
-    .string()
-    .min(1, "Email field cannot be empty")
-    .email("Please enter a valid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters long"),
-  mobileNumber: z.string().min(10, "Please enter a valid mobile number"),
-  address: z.string().min(1, "Address field cannot be empty"),
-  role: z.string().min(["staff", "value"], "Please select a staff type"),
-});
 
 const StaffRegistration = ({ setIsOpen }) => {
   const [loading, setLoading] = useState(false);

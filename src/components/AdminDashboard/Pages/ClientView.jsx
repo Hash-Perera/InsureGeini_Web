@@ -61,7 +61,6 @@ const ClientView = () => {
   });
 
   const handleDelete = (id) => {
-    console.log("Delete vehicle with ID:", id);
     deleteMutation.mutate(id);
   };
 

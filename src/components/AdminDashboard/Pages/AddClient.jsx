@@ -24,42 +24,11 @@ import {
   SelectLabel,
   SelectValue,
 } from "@/components/ui/select";
-import { policies } from "../../Registrations/policyData.js";
+import { policies } from "../../../constants/policyData.js";
 import VehicleRegistration from "@/components/Registrations/VehicleRegistration";
 import { Loader } from "lucide-react";
 import { useParams } from "react-router-dom";
-
-const imageFileSchema = z
-  .instanceof(File)
-  .refine((file) => file.size > 0, "File cannot be empty")
-  .refine(
-    (file) => ["image/jpeg", "image/png", "image/gif"].includes(file.type),
-    "Invalid file type"
-  )
-  .refine(
-    (file) => file.size <= 5 * 1024 * 1024,
-    "File size must be less than 5MB"
-  );
-
-// Define Zod Schema
-const clientRegistrationSchema = z.object({
-  name: z.string().min(1, "First name cannot be empty"),
-  email: z
-    .string()
-    .min(1, "Email cannot be empty")
-    .email("Invalid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  nicNo: z.string().min(1, "NIC cannot be empty"),
-  insuranceId: z.string().min(1, "Insurance ID cannot be empty"),
-  mobileNumber: z.string().min(10, "Invalid mobile number"),
-  address: z.string().min(1, "Address cannot be empty"),
-  role: z.string().min(["client", "value"], "Please select a client type"),
-  dob: z.string().min(1, "Date of birth cannot be empty"),
-  drivingLicenseNo: z.string().min(1, "Driving license number cannot be empty"),
-  inusrancePolicy: z.string().min(1, "Insurance policy cannot be empty"),
-  drivingLicenseImage: imageFileSchema,
-  nicImage: imageFileSchema,
-});
+import { clientRegistrationSchema } from "@/constants/validationSchema.js";
 
 const AddClient = () => {
   const { id } = useParams();
@@ -101,7 +70,6 @@ const AddClient = () => {
         return response;
       } catch (error) {
         setLoading(false);
-        // toast.error("Error adding customer");
       }
     },
   });
@@ -416,14 +384,13 @@ const AddClient = () => {
       )}
 
       {/* Show Vehicle Registration Form */}
-      {(isCustomerRegistered && userId) ||
-        (id && (
-          <VehicleRegistration
-            userId={userId || id}
-            setUserId={setUserId}
-            setIsCustomerRegistered={setIsCustomerRegistered}
-          />
-        ))}
+      {(isCustomerRegistered && userId) || id ? (
+        <VehicleRegistration
+          userId={isCustomerRegistered && userId ? userId : id}
+          setUserId={setUserId}
+          setIsCustomerRegistered={setIsCustomerRegistered}
+        />
+      ) : null}
     </div>
   );
 };

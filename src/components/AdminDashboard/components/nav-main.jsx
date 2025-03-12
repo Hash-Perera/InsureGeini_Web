@@ -59,7 +59,7 @@ export function NavMain({ items }) {
                     handleNavigation(item?.items?.[0]?.url);
                   }}
                 >
-                  {item.icon && <item.icon />}
+                  {item.icon && <item.icon className="text-blue-600" />}
                   <span
                     className={clsx(
                       "ml-2",

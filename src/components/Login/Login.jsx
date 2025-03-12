@@ -40,7 +40,7 @@ const Login = () => {
         localStorage.setItem("token", token);
         localStorage.setItem("role", role);
         setLoading(false);
-        navigate("/admin/staff");
+        navigate("/admin/dashboard");
         return response;
       } catch (error) {
         setError("Invalid email or password");

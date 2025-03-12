@@ -34,139 +34,15 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-import { policies } from "./policyData.js";
+import {
+  policies,
+  generalProtectionAddons,
+  vehicleSpecificAddons,
+  usageSpecificAddons,
+  workRelatedCommercialUseAddons,
+} from "../../constants/policyData.js";
 
-const generalProtectionAddons = [
-  {
-    label: "No Claim Bonus (NCB) – Discounts on premiums for claim-free years.",
-    value: "ncb",
-  },
-  {
-    label: "Compulsory & Voluntary Excess – Deductibles applied to claims.",
-    value: "excess",
-  },
-  {
-    label:
-      "Flood & Natural Perils Coverage – Protection against floods, storms, earthquakes, landslides, etc.",
-    value: "flood_natural_perils",
-  },
-  {
-    label:
-      "Strike, Riot & Civil Commotion Coverage – Covers damages from riots or protests.",
-    value: "strike_riot_civil_commotion",
-  },
-  {
-    label:
-      "Personal Accident Benefits – Compensation for injury/death of the owner or passengers.",
-    value: "personal_accident",
-  },
-];
-
-const vehicleSpecificAddons = [
-  {
-    label:
-      "Towing Charges – Covers costs of towing after a breakdown or accident.",
-    value: "towing_charges",
-  },
-  {
-    label:
-      "Breakage of Windscreen/Windows – Covers repair/replacement of broken glass.",
-    value: "windscreen_breakage",
-  },
-  {
-    label:
-      "Air Bag Extension – Covers replacement of airbags after an accident.",
-    value: "air_bag_extension",
-  },
-  {
-    label:
-      "Institutional Loan Clause – Protects lenders if the vehicle is financed/leased.",
-    value: "institutional_loan_clause",
-  },
-];
-
-const usageSpecificAddons = [
-  {
-    label:
-      "Learner Driver/Rider Extension – Covers damages when a learner driver is operating the vehicle.",
-    value: "learner_driver_extension",
-  },
-  {
-    label:
-      "Third-Party Property Damage (TPPD) – Higher coverage limits for damages to other people’s property.",
-    value: "tppd",
-  },
-];
-
-const workRelatedCommercialUseAddons = [
-  {
-    label:
-      "Passenger Risk Coverage – Liability coverage for passengers (especially for commercial vehicles).",
-    value: "passenger_risk_coverage",
-  },
-  {
-    label:
-      "Goods in Transit (Non-Hazardous) – Covers damage to transported goods.",
-    value: "goods_in_transit_non_hazardous",
-  },
-  {
-    label:
-      "Goods in Transit (Hazardous) – Covers hazardous material transport.",
-    value: "goods_in_transit_hazardous",
-  },
-  {
-    label:
-      "Workmen’s Compensation Insurance – Covers drivers, attendants, and workers against injuries.",
-    value: "workmens_compensation",
-  },
-  {
-    label:
-      "Omni Buses with Route Permits – Coverage for buses with legal passenger transport permits.",
-    value: "omni_buses_route_permits",
-  },
-];
-
-// Vehicle Registration Schema
-const vehicleRegistrationSchema = z.object({
-  userId: z.string().min(1, "User ID is required"),
-  insurancePolicy: z.string().min(1, "Insurance policy number is required"),
-  policyAdOns: z.object({
-    generaProtection: z.array(z.string()),
-    vehicleSpecific: z.array(z.string()),
-    usageSpecific: z.array(z.string()),
-    workRelated: z.array(z.string()),
-  }),
-  insuranceCardImageFront: z
-    .instanceof(File, "Insurance card front image is required") // Validates that the file is provided
-    .refine((file) => file?.size > 0, "Insurance card front image is required"),
-  insuranceCardImageBack: z
-    .instanceof(File, "Insurance card back image is required") // Validates that the file is provided
-    .refine((file) => file?.size > 0, "Insurance card back image is required"),
-  vehicleModel: z.string().min(1, "Vehicle model is required"),
-  vehiclePhotosFront: z
-    .instanceof(File, "Vehicle front photo is required")
-    .refine((file) => file?.size > 0, "Vehicle front photo is required"),
-  vehiclePhotosBack: z
-    .instanceof(File, "Vehicle back photo is required")
-    .refine((file) => file?.size > 0, "Vehicle back photo is required"),
-  vehiclePhotosLeft: z
-    .instanceof(File, "Vehicle left photo is required")
-    .refine((file) => file?.size > 0, "Vehicle left photo is required"),
-  vehiclePhotosRight: z
-    .instanceof(File, "Vehicle right photo is required")
-    .refine((file) => file?.size > 0, "Vehicle right photo is required"),
-  engineNo: z.string().min(1, "Engine number is required"),
-  chassisNo: z.string().min(1, "Chassis number is required"),
-  vinNumber: z.string().min(1, "VIN number is required"),
-  vehicleColor: z.string().min(1, "Vehicle color is required"),
-  vehicleNumberPlate: z.string().min(1, "Vehicle number plate is required"),
-  numberPlateImageFront: z
-    .instanceof(File, "Number plate front image is required")
-    .refine((file) => file?.size > 0, "Number plate front image is required"),
-  numberPlateImageBack: z
-    .instanceof(File, "Number plate back image is required")
-    .refine((file) => file?.size > 0, "Number plate back image is required"),
-});
+import { vehicleRegistrationSchema } from "@/constants/validationSchema.js";
 
 const VehicleRegistration = ({
   userId,
@@ -273,20 +149,16 @@ const VehicleRegistration = ({
       }
     });
 
-    // Create a JSON object with all the non-file data
     const jsonData = {};
 
-    // Copy all non-file fields to jsonData
     Object.keys(data).forEach((key) => {
       if (!imageFields.includes(key)) {
         jsonData[key] = data[key];
       }
     });
 
-    // Add the JSON data as a single field
     formData.append("jsonData", JSON.stringify(jsonData));
 
-    // Send the combined data
     mutation.mutate(formData);
   };
 
@@ -294,9 +166,6 @@ const VehicleRegistration = ({
     setIsCustomerRegistered(false);
     setUserId(null);
   };
-
-  console.log("formState : ", vehicleRegistrationForm.watch());
-  console.log("errors : ", vehicleRegistrationForm.formState.errors);
 
   return (
     <div className="w-full ">
