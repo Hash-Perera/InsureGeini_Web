@@ -13,6 +13,7 @@ import { AdminContextProvider } from "./contexts/AdminContext.jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AddClient from "./components/AdminDashboard/Pages/AddClient";
 import ClientView from "./components/AdminDashboard/Pages/ClientView";
+import Claims from "./components/AdminDashboard/Pages/Claims";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,14 @@ const router = createBrowserRouter([
           {
             path: "reports",
             element: <Reports />,
+          },
+          {
+            path: "Claims",
+            element: <Claims />,
+          },
+          {
+            path: "Claims/:id",
+            element: <Claims />,
           },
         ],
       },

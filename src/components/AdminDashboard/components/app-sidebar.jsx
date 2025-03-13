@@ -8,6 +8,7 @@ import {
   GalleryVerticalEnd,
   Map,
   PieChart,
+  Paperclip,
 } from "lucide-react";
 
 import { NavMain } from "@/components/AdminDashboard/components/nav-main";
@@ -58,6 +59,17 @@ const data = {
         {
           title: "Clients",
           url: "/admin/clients",
+        },
+      ],
+    },
+    {
+      title: "Claims",
+      url: "",
+      icon: Paperclip,
+      items: [
+        {
+          title: "List",
+          url: "/admin/claims",
         },
       ],
     },
