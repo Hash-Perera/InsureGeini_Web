@@ -2,12 +2,15 @@ import * as React from "react";
 import {
   AudioWaveform,
   BookOpen,
-  Bot,
   Command,
   Frame,
   GalleryVerticalEnd,
   Map,
   PieChart,
+  CircleGauge,
+  Users,
+  FileText,
+  MessageSquareCode,
 } from "lucide-react";
 
 import { NavMain } from "@/components/AdminDashboard/components/nav-main";
@@ -24,8 +27,8 @@ import {
 // This is sample data.
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
+    name: "InsureGeni",
+    email: "admin.admin.com",
     avatar: "/avatars/shadcn.jpg",
   },
   teams: [
@@ -47,9 +50,20 @@ const data = {
   ],
   navMain: [
     {
+      title: "Dashboard",
+      url: "/admin/dashboard",
+      icon: CircleGauge,
+      items: [
+        {
+          title: "Dashboard",
+          url: "/admin/dashboard",
+        },
+      ],
+    },
+    {
       title: "Users",
       url: "",
-      icon: Bot,
+      icon: Users,
       items: [
         {
           title: "Staff",
@@ -64,7 +78,7 @@ const data = {
     {
       title: "Reports",
       url: "#",
-      icon: Bot,
+      icon: FileText,
       items: [
         {
           title: "Incident-Reports",
@@ -76,30 +90,13 @@ const data = {
     {
       title: "Customer Reviews",
       url: "#",
-      icon: BookOpen,
+      icon: MessageSquareCode,
       items: [
         {
           title: "Reviews Dashboard",
           url: "/admin/feedback",
         },
       ],
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
     },
   ],
 };

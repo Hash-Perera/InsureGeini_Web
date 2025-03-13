@@ -21,48 +21,28 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import policyData from "@/components/Registrations/policies.json";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { addVehicle } from "@/services/vehicle";
 import { Loader } from "lucide-react";
 import { useParams } from "react-router-dom";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
-// Vehicle Registration Schema
-const vehicleRegistrationSchema = z.object({
-  userId: z.string().min(1, "User ID is required"),
-  insurancePolicyNo: z.string().min(1, "Insurance policy number is required"),
-  insuranceCardImageFront: z
-    .instanceof(File, "Insurance card front image is required") // Validates that the file is provided
-    .refine((file) => file?.size > 0, "Insurance card front image is required"),
-  insuranceCardImageBack: z
-    .instanceof(File, "Insurance card back image is required") // Validates that the file is provided
-    .refine((file) => file?.size > 0, "Insurance card back image is required"),
-  vehicleModel: z.string().min(1, "Vehicle model is required"),
-  vehiclePhotosFront: z
-    .instanceof(File, "Vehicle front photo is required")
-    .refine((file) => file?.size > 0, "Vehicle front photo is required"),
-  vehiclePhotosBack: z
-    .instanceof(File, "Vehicle back photo is required")
-    .refine((file) => file?.size > 0, "Vehicle back photo is required"),
-  vehiclePhotosLeft: z
-    .instanceof(File, "Vehicle left photo is required")
-    .refine((file) => file?.size > 0, "Vehicle left photo is required"),
-  vehiclePhotosRight: z
-    .instanceof(File, "Vehicle right photo is required")
-    .refine((file) => file?.size > 0, "Vehicle right photo is required"),
-  engineNo: z.string().min(1, "Engine number is required"),
-  chassisNo: z.string().min(1, "Chassis number is required"),
-  vinNumber: z.string().min(1, "VIN number is required"),
-  vehicleColor: z.string().min(1, "Vehicle color is required"),
-  vehicleNumberPlate: z.string().min(1, "Vehicle number plate is required"),
-  numberPlateImageFront: z
-    .instanceof(File, "Number plate front image is required")
-    .refine((file) => file?.size > 0, "Number plate front image is required"),
-  numberPlateImageBack: z
-    .instanceof(File, "Number plate back image is required")
-    .refine((file) => file?.size > 0, "Number plate back image is required"),
-});
+import {
+  policies,
+  generalProtectionAddons,
+  vehicleSpecificAddons,
+  usageSpecificAddons,
+  workRelatedCommercialUseAddons,
+} from "../../constants/policyData.js";
+
+import { vehicleRegistrationSchema } from "@/constants/validationSchema.js";
 
 const VehicleRegistration = ({
   userId,
@@ -71,12 +51,17 @@ const VehicleRegistration = ({
 }) => {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
-  console.log(userId);
   const vehicleRegistrationForm = useForm({
     resolver: zodResolver(vehicleRegistrationSchema),
     defaultValues: {
       userId: userId,
-      insurancePolicyNo: "",
+      insurancePolicy: "",
+      policyAdOns: {
+        generaProtection: [],
+        vehicleSpecific: [],
+        usageSpecific: [],
+        workRelated: [],
+      },
       vehicleModel: "",
       engineNo: "",
       chassisNo: "",
@@ -143,14 +128,36 @@ const VehicleRegistration = ({
 
   const onSubmit = async (data) => {
     setLoading(true);
-    console.log(data); // For debugging
     const formData = new FormData();
 
-    for (const key in data) {
-      if (data[key]) {
-        formData.append(key, data[key]);
+    // Extract image files
+    const imageFields = [
+      "insuranceCardImageFront",
+      "insuranceCardImageBack",
+      "vehiclePhotosFront",
+      "vehiclePhotosBack",
+      "vehiclePhotosLeft",
+      "vehiclePhotosRight",
+      "numberPlateImageFront",
+      "numberPlateImageBack",
+    ];
+
+    // Add image files to FormData
+    imageFields.forEach((field) => {
+      if (data[field]) {
+        formData.append(field, data[field]);
       }
-    }
+    });
+
+    const jsonData = {};
+
+    Object.keys(data).forEach((key) => {
+      if (!imageFields.includes(key)) {
+        jsonData[key] = data[key];
+      }
+    });
+
+    formData.append("jsonData", JSON.stringify(jsonData));
 
     mutation.mutate(formData);
   };
@@ -180,26 +187,26 @@ const VehicleRegistration = ({
       </div>
       <Form {...vehicleRegistrationForm}>
         <form
-          className="p-3 space-y-4 bg-gray-100 rounded-lg"
+          className="p-3 space-y-4 rounded-lg bg-gray-50"
           onSubmit={vehicleRegistrationForm.handleSubmit(onSubmit)}
         >
           {/* Insurance Policy Select */}
           <FormField
             control={vehicleRegistrationForm.control}
-            name="insurancePolicyNo"
+            name="insurancePolicy"
             render={({ field }) => (
               <FormItem>
-                <Label htmlFor="insurancePolicyNo">Insurance Policy</Label>
+                <Label htmlFor="insurancePolicy">Insurance Policy</Label>
                 <FormControl>
                   <Select
-                    id="insurancePolicyNo"
+                    id="insurancePolicy"
                     value={field.value}
                     onValueChange={field.onChange}
                     className="w-full max-w-md"
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select an insurance policy">
-                        {policyData?.insurance_policies?.find(
+                        {policies?.find(
                           (policy) => policy.title === field.value
                         )?.title || "Select an insurance policy"}
                       </SelectValue>
@@ -207,8 +214,8 @@ const VehicleRegistration = ({
                     <SelectContent>
                       <SelectGroup>
                         <SelectLabel>Insurance Policies</SelectLabel>
-                        {policyData?.insurance_policies?.map((policy) => (
-                          <SelectItem key={policy.index} value={policy.title}>
+                        {policies?.map((policy, index) => (
+                          <SelectItem key={index} value={policy.title}>
                             <div className="flex flex-col gap-1">
                               <p className="text-sm font-medium">
                                 {policy.title}
@@ -227,6 +234,169 @@ const VehicleRegistration = ({
               </FormItem>
             )}
           />
+
+          <Accordion type="single" collapsible>
+            <AccordionItem value="item-1">
+              <AccordionTrigger className="no-underline hover:no-underline">
+                Insurance Policy Add Ons
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="flex flex-col gap-2 ">
+                  <div className="flex flex-col gap-2">
+                    <Label>General Protection Add Ons</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {generalProtectionAddons.map((addon) => (
+                        <FormField
+                          key={addon.value}
+                          control={vehicleRegistrationForm.control}
+                          name="policyAdOns.generaProtection"
+                          render={({ field }) => {
+                            return (
+                              <FormItem className="flex items-center gap-2 mt-1">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(addon.value)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([
+                                            ...field.value,
+                                            addon.value,
+                                          ])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                              (value) => value !== addon.value
+                                            )
+                                          );
+                                    }}
+                                  />
+                                </FormControl>
+                                <Label className="text-xs">{addon.label}</Label>
+                              </FormItem>
+                            );
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2 mt-3">
+                    <Label>
+                      Vehicle Specific Add Ons (Optional - Select if applicable)
+                    </Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {vehicleSpecificAddons?.map((addon) => (
+                        <FormField
+                          key={addon.value}
+                          control={vehicleRegistrationForm.control}
+                          name="policyAdOns.vehicleSpecific"
+                          render={({ field }) => {
+                            return (
+                              <FormItem className="flex items-center gap-2 mt-1">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(addon.value)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([
+                                            ...field.value,
+                                            addon.value,
+                                          ])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                              (value) => value !== addon.value
+                                            )
+                                          );
+                                    }}
+                                  />
+                                </FormControl>
+                                <Label className="text-xs">{addon.label}</Label>
+                              </FormItem>
+                            );
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2 mt-3">
+                    <Label>
+                      Usage Specific Add Ons (Optional - Select if applicable)
+                    </Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {usageSpecificAddons?.map((addon) => (
+                        <FormField
+                          key={addon.value}
+                          control={vehicleRegistrationForm.control}
+                          name="policyAdOns.usageSpecific"
+                          render={({ field }) => {
+                            return (
+                              <FormItem className="flex items-center gap-2 mt-1">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(addon.value)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([
+                                            ...field.value,
+                                            addon.value,
+                                          ])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                              (value) => value !== addon.value
+                                            )
+                                          );
+                                    }}
+                                  />
+                                </FormControl>
+                                <Label className="text-xs">{addon.label}</Label>
+                              </FormItem>
+                            );
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2 mt-3">
+                    <Label>
+                      Work Related Commercial Use Add Ons (Optional - Select if
+                      applicable)
+                    </Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {workRelatedCommercialUseAddons?.map((addon) => (
+                        <FormField
+                          key={addon.value}
+                          control={vehicleRegistrationForm.control}
+                          name="policyAdOns.workRelated"
+                          render={({ field }) => {
+                            return (
+                              <FormItem className="flex items-center gap-2 mt-1">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(addon.value)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([
+                                            ...field.value,
+                                            addon.value,
+                                          ])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                              (value) => value !== addon.value
+                                            )
+                                          );
+                                    }}
+                                  />
+                                </FormControl>
+                                <Label className="text-xs">{addon.label}</Label>
+                              </FormItem>
+                            );
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
 
           {/* Vehicle Details */}
           <div className="grid grid-cols-2 gap-2">
@@ -493,50 +663,3 @@ const VehicleRegistration = ({
 };
 
 export default VehicleRegistration;
-
-/* const VehicleOwnerSelect = ({ clients, onValueChange }) => {
-  const [searchTerm, setSearchTerm] = React.useState("");
-  const [selectedClient, setselectedClient] = React.useState("");
-
-  // Filter clients based on the search term
-  const filteredclients = clients.filter((client) =>
-    client.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const handleSelect = (value) => {
-    setselectedClient(value); // Update local state
-    onValueChange(value); // Trigger the external callback
-  };
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="outline" className="w-[280px] justify-start">
-          {selectedClient ? (
-            <span>{selectedClient}</span>
-          ) : (
-            <span>Select Client</span>
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[280px] p-0" align="start">
-        <Command>
-          <CommandInput
-            placeholder="Search Client..."
-            value={searchTerm}
-            onValueChange={setSearchTerm}
-          />
-          <CommandList>
-            <CommandEmpty>No clients for that id </CommandEmpty>
-            <CommandGroup>
-              {filteredclients.map((client) => (
-                <CommandItem key={client} onSelect={() => handleSelect(client)}>
-                  <span>{client}</span>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
-  );
-}; */

@@ -22,6 +22,7 @@ import {
   Camera,
   Edit,
   SquarePlus,
+  ShieldPlus,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -30,12 +31,12 @@ import { toast } from "sonner";
 
 const ClientView = () => {
   const { id } = useParams();
+  const queryClient = useQueryClient();
   const { data: customerData } = useQuery({
     queryKey: ["customer", id],
     queryFn: async () => {
       try {
         const response = await getCustomerById(id);
-        toast.success("Customer details loaded successfully");
         return response;
       } catch (error) {
         console.error("Error fetching all customers:", error.message);
@@ -45,6 +46,24 @@ const ClientView = () => {
     staleTime: Infinity,
     retry: false,
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      try {
+        const response = await deleteVehicle(id);
+        queryClient.invalidateQueries({ queryKey: ["customer", id] });
+        toast.success("Vehicle deleted successfully");
+        return response;
+      } catch (error) {
+        console.error("Error deleting staff:", error.message);
+        throw error;
+      }
+    },
+  });
+
+  const handleDelete = (id) => {
+    deleteMutation.mutate(id);
+  };
 
   return (
     <div className="flex flex-col w-full gap-8">
@@ -213,16 +232,17 @@ const ClientView = () => {
         </div>
       </div>
 
-      <VehicleDetailsView vehicles={customerData?.vehicles} />
+      <VehicleDetailsView
+        vehicles={customerData?.vehicles}
+        handleDelete={handleDelete}
+      />
     </div>
   );
 };
 
 export default ClientView;
 
-const VehicleDetailsView = ({ vehicles }) => {
-  const { id } = useParams();
-  const queryClient = useQueryClient();
+const VehicleDetailsView = ({ vehicles, handleDelete }) => {
   const [expandedVehicles, setExpandedVehicles] = useState({});
 
   if (!vehicles || vehicles.length === 0) {
@@ -242,24 +262,6 @@ const VehicleDetailsView = ({ vehicles }) => {
       ...prev,
       [id]: !prev[id],
     }));
-  };
-
-  /*   const deleteMutation = useMutation({
-    mutationFn: async (id) => {
-      try {
-        const response = await deleteVehicle(id);
-        queryClient.invalidateQueries({ queryKey: ["customer", id] });
-        toast.success("Vehicle deleted successfully");
-        return response;
-      } catch (error) {
-        console.error("Error deleting staff:", error.message);
-        throw error;
-      }
-    },
-  }); */
-
-  const handleDelete = (id) => {
-    // deleteMutation.mutate(id);
   };
 
   return (
@@ -323,9 +325,44 @@ const VehicleDetailsView = ({ vehicles }) => {
                       Insurance Policy
                     </h3>
                     <p className="text-base font-medium text-gray-800">
-                      {vehicle.insurancePolicyNo}
+                      {vehicle.insurancePolicy}
                     </p>
                   </div>
+                </div>
+
+                {/* Policy AdOns */}
+                <div className="flex flex-col gap-3 p-3 transition-all rounded-lg bg-gray-50 hover:bg-gray-100">
+                  <div className="flex items-start gap-3 ">
+                    <ShieldPlus className="w-5 h-5 text-indigo-500" />
+                    <h3 className="text-sm font-medium text-gray-500">
+                      Policy AdOns
+                    </h3>
+                  </div>
+
+                  {/* Loop through each category of policy add-ons */}
+                  {Object.entries(vehicle.policyAdOns).map(
+                    ([category, items]) =>
+                      items.length > 0 && (
+                        <div
+                          key={category}
+                          className="p-3 bg-white rounded-lg "
+                        >
+                          <h4 className="text-sm font-medium text-gray-600">
+                            {category.replace(/([A-Z])/g, " $1")}
+                          </h4>
+                          <ul className="pl-5 list-disc">
+                            {items.map((item, index) => (
+                              <li
+                                key={index}
+                                className="text-base font-medium text-gray-800"
+                              >
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )
+                  )}
                 </div>
 
                 {/* Engine Number */}

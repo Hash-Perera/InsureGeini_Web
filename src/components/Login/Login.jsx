@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/form";
 import { useMutation } from "@tanstack/react-query";
 import { login } from "@/services/auth";
+import { Loader } from "lucide-react";
 
 const signInSchema = z.object({
   email: z.string().min(1, "Password field cannot be empty"),
@@ -22,6 +23,7 @@ const signInSchema = z.object({
 const Login = () => {
   const navigate = useNavigate();
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const form = useForm({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -37,10 +39,12 @@ const Login = () => {
         const { token, role } = response;
         localStorage.setItem("token", token);
         localStorage.setItem("role", role);
-        navigate("/admin/staff");
+        setLoading(false);
+        navigate("/admin/dashboard");
         return response;
       } catch (error) {
         setError("Invalid email or password");
+        setLoading(false);
         console.error("Error logging in:", error.message);
         throw error;
       }
@@ -113,11 +117,16 @@ const Login = () => {
             <button
               className="inline-flex gap-x-1.5 items-center justify-center w-full h-10 px-4 py-2 mt-2 text-xs font-medium transition rounded-md whitespace-nowrap ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-[#191B33] text-zinc-50"
               type="button"
+              disabled={loading}
               onClick={form.handleSubmit(handleSubmit.mutate)}
             >
-              <span className="text-[16px] font-medium">
-                Continue with email
-              </span>
+              {loading ? (
+                <Loader size={16} className=" animate-spin" />
+              ) : (
+                <span className="text-[16px] font-medium">
+                  Continue with email
+                </span>
+              )}
             </button>
           </form>
         </Form>
