@@ -17,7 +17,7 @@ export function NavUser({ user }) {
           className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
           side={isMobile ? "bottom" : "right"}
           align="end"
-          sideOffset={4}
+          sideoffset={4}
         >
           <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
             <Avatar className="w-8 h-8 rounded-lg">

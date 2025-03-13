@@ -8,3 +8,12 @@ export const getAllClaims = async () => {
     throw error;
   }
 };
+
+export const getClaimById = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/claims/detail/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

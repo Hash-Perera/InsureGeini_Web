@@ -15,6 +15,7 @@ import AddClient from "./components/AdminDashboard/Pages/AddClient";
 import ClientView from "./components/AdminDashboard/Pages/ClientView";
 import Claims from "./components/AdminDashboard/Pages/Claims";
 import Dashboard from "./components/AdminDashboard/Pages/Dashboard";
+import ClaimsView from "./components/AdminDashboard/Pages/ClaimsView";
 
 const queryClient = new QueryClient();
 
@@ -72,7 +73,7 @@ const router = createBrowserRouter([
           },
           {
             path: "Claims/:id",
-            element: <Claims />,
+            element: <ClaimsView />,
           },
         ],
       },
