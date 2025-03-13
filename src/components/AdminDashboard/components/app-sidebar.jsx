@@ -8,7 +8,6 @@ import {
   GalleryVerticalEnd,
   Map,
   PieChart,
-  SquareTerminal,
 } from "lucide-react";
 
 import { NavMain } from "@/components/AdminDashboard/components/nav-main";
@@ -31,9 +30,9 @@ const data = {
   },
   teams: [
     {
-      name: "Acme Inc",
+      name: "InsureGeni",
       logo: GalleryVerticalEnd,
-      plan: "Enterprise",
+      plan: "Admin",
     },
     {
       name: "Acme Corp.",
@@ -48,33 +47,17 @@ const data = {
   ],
   navMain: [
     {
-      title: "Dashboard",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Started",
-          url: "#",
-        },
-      ],
-    },
-    {
       title: "Users",
-      url: "#",
+      url: "",
       icon: Bot,
       items: [
         {
           title: "Staff",
-          url: "#",
+          url: "/admin/staff",
         },
         {
           title: "Clients",
-          url: "#",
+          url: "/admin/clients",
         },
       ],
     },
@@ -85,7 +68,7 @@ const data = {
       items: [
         {
           title: "Incident-Reports",
-          url: "#",
+          url: "/admin/reports",
         },
       ],
     },
@@ -97,7 +80,7 @@ const data = {
       items: [
         {
           title: "Reviews Dashboard",
-          url: "#",
+          url: "/admin/feedback",
         },
       ],
     },

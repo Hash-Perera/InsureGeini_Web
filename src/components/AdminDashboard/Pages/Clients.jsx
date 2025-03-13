@@ -1,87 +1,162 @@
-import ClientRegistration from "@/components/Registrations/ClientRegistration";
-import VehicleRegistration from "@/components/Registrations/VehicleRegistration";
-import { DataTable } from "@/components/ui/data-table";
+import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { getAllCustomers } from "@/services/customer";
+import SharedDataTable from "../components/SharedDataTable";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal } from "lucide-react";
 
+const columns = [
+  {
+    accessorKey: "_id", // Assuming 'userId' is available or you can use '_id'
+    header: "User ID",
+    cell: ({ row }) => (
+      <div className="font-medium text-blue-600">{row.getValue("_id")}</div>
+    ),
+  },
+  {
+    accessorKey: "name",
+    header: "Name",
+    cell: ({ row }) => (
+      <div className="font-medium">{row.getValue("name")}</div>
+    ),
+  },
+  {
+    accessorKey: "email",
+    header: "Email",
+    cell: ({ row }) => (
+      <div className="font-medium text-blue-600">
+        <a href={`mailto:${row.getValue("email")}`}>{row.getValue("email")}</a>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "mobileNumber",
+    header: "Mobile Number",
+    cell: ({ row }) => (
+      <div className="font-medium">{row.getValue("mobileNumber")}</div>
+    ),
+  },
+  {
+    accessorKey: "address",
+    header: "Address",
+    cell: ({ row }) => (
+      <div className="font-medium">{row.getValue("address")}</div>
+    ),
+  },
+  {
+    accessorKey: "dob",
+    header: "Date of Birth",
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("dob"));
+      const formattedDate = date.toLocaleDateString(); // Format the date
+      return <div className="font-medium">{formattedDate}</div>;
+    },
+  },
+  {
+    accessorKey: "nicNo",
+    header: "NIC No",
+    cell: ({ row }) => (
+      <div className="font-medium">{row.getValue("nicNo")}</div>
+    ),
+  },
+  {
+    accessorKey: "insuranceId",
+    header: "Insurance ID",
+    cell: ({ row }) => (
+      <div className="font-medium">{row.getValue("insuranceId")}</div>
+    ),
+  },
+  {
+    accessorKey: "inusrancePolicy",
+    header: "Insurance Policy",
+    cell: ({ row }) => (
+      <div className="font-medium">{row.getValue("inusrancePolicy")}</div>
+    ),
+  },
+
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => {
+      const record = row.original;
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="w-8 h-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem
+              onClick={() => navigator.clipboard.writeText(record.userId)}
+            >
+              Copy User ID
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() =>
+                navigator.clipboard.writeText(record.inusrancePolicy)
+              }
+            >
+              Copy Insurance Policy
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <Link to={`/admin/clients/${record._id}`}>View Details</Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
+  },
+];
 const Clients = () => {
+  const { data: customerData } = useQuery({
+    queryKey: ["customers"],
+    queryFn: async () => {
+      try {
+        const response = await getAllCustomers();
+        return response;
+      } catch (error) {
+        console.error("Error fetching all customers:", error.message);
+        throw error;
+      }
+    },
+    staleTime: Infinity,
+    retry: false,
+  });
+
   return (
     <div className="flex flex-col justify-center w-full gap-8">
       <div className="flex items-center justify-between w-full ">
         <h1 className="text-4xl font-semibold ">Clients List</h1>
-        <Dialog>
-          <DialogTrigger className="px-2 py-2 text-sm text-white transition-all duration-75 transform bg-black hover:bg-stone-950 sm:rounded-md">
-            Add Client
-          </DialogTrigger>
-          <DialogContent className="max-w-[39rem]  space-y-4  " close={false}>
-            <Tabs defaultValue="client" className="w-full">
-              <TabsList className="w-full h-11">
-                <TabsTrigger className="w-full h-9" value="client">
-                  Add New Client
-                </TabsTrigger>
-                <TabsTrigger className="w-full h-9" value="vehicle">
-                  Add New Vehicle
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="client">
-                <DialogHeader className={" my-5"}>
-                  <DialogDescription>
-                    Add a new client to the system.
-                  </DialogDescription>
-                </DialogHeader>
-                <ClientRegistration />
-              </TabsContent>
-              <TabsContent value="vehicle">
-                <DialogHeader>
-                  <DialogDescription>
-                    Add a new vehicle to the system.
-                  </DialogDescription>
-                </DialogHeader>
-                <VehicleRegistration />
-              </TabsContent>
-            </Tabs>
-          </DialogContent>
-        </Dialog>
+        <Link
+          to="/admin/clients/add"
+          className="px-2 py-2 text-sm text-white transition-all duration-75 transform bg-black hover:bg-stone-950 sm:rounded-md"
+        >
+          Add Client
+        </Link>
       </div>
-
-      {/* Client table */}
-      <DataTable
-        columns={[
-          {
-            accessorKey: "name",
-            header: "Name",
-          },
-          {
-            accessorKey: "email",
-            header: "Email",
-          },
-          {
-            accessorKey: "phone",
-            header: "Phone",
-          },
-          {
-            accessorKey: "role",
-            header: "Role",
-          },
-          {
-            accessorKey: "actions",
-            header: "Actions",
-          },
-        ]}
-        data={[
-          {
-            name: "John Doe",
-            email: "",
-            phone: "",
-            role: "Admin",
-            actions: "",
-          },
+      <SharedDataTable
+        data={customerData?.data || []}
+        columns={columns}
+        searchBy={[
+          "name",
+          "email",
+          "mobileNumber",
+          "address",
+          "nicNo",
+          "insuranceId",
+          "inusrancePolicy",
         ]}
       />
     </div>
