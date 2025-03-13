@@ -17,3 +17,12 @@ export const getClaimById = async (id) => {
     throw error;
   }
 };
+
+export const fraudCompare = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/claims/claimFraud/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
