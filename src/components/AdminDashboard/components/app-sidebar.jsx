@@ -7,6 +7,7 @@ import {
   GalleryVerticalEnd,
   Map,
   PieChart,
+  Paperclip,
   CircleGauge,
   Users,
   FileText,
@@ -72,6 +73,17 @@ const data = {
         {
           title: "Clients",
           url: "/admin/clients",
+        },
+      ],
+    },
+    {
+      title: "Claims",
+      url: "",
+      icon: Paperclip,
+      items: [
+        {
+          title: "List",
+          url: "/admin/claims",
         },
       ],
     },
