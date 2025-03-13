@@ -14,6 +14,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AddClient from "./components/AdminDashboard/Pages/AddClient";
 import ClientView from "./components/AdminDashboard/Pages/ClientView";
 import Claims from "./components/AdminDashboard/Pages/Claims";
+import Dashboard from "./components/AdminDashboard/Pages/Dashboard";
 
 const queryClient = new QueryClient();
 
@@ -34,12 +35,12 @@ const router = createBrowserRouter([
         ),
         children: [
           {
-            path: "reports/:userId",
-            element: <div>Report id </div>,
-          },
-          {
             path: "staff",
             element: <Staff />,
+          },
+          {
+            path: "dashboard",
+            element: <Dashboard />,
           },
           {
             path: "clients",
