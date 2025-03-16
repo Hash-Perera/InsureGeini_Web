@@ -85,3 +85,8 @@ export const clientRegistrationSchema = z.object({
   drivingLicenseImage: imageFileSchema,
   nicImage: imageFileSchema,
 });
+
+export const fraudApproveSchema = z.object({
+  claimId: z.string().min(1, "User ID is required"),
+  status: z.string().min(1, "Status is required"),
+});
