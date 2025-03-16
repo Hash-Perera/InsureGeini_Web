@@ -26,3 +26,13 @@ export const fraudCompare = async (id) => {
     throw error;
   }
 };
+
+export const fraudApprove = async (id) => {
+  try {
+    console.log("Fraud Appro");
+    // const response = await axiosInstance.get(`/claims/approveFraud/${id}`);
+    // return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
