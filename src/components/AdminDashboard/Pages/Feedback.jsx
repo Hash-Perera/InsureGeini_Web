@@ -1,10 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Download } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -13,7 +7,6 @@ import autoTable from "jspdf-autotable";
 import { CalendarIcon } from "lucide-react";
 import Swal from "sweetalert2";
 import FeedbackDetailsDialog from "./FeedbackDetailDialog";
-
 import {
   PieChart,
   Pie,
@@ -54,16 +47,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import SharedDataTable from "../components/SharedDataTable";
-import axios from "axios";
+import axiosInstance from "@/hooks/axios";
 import { Progress } from "@/components/ui/progress";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
 const chartConfig = {
-  positive: { label: "Positive", color: "#4caf50" },
-  neutral: { label: "Neutral", color: "#ffeb3b" },
-  negative: { label: "Negative", color: "#f44336" },
+  positive: { label: "positive", color: "#4caf50" },
+  neutral: { label: "neutral", color: "#ffeb3b" },
+  negative: { label: "negative", color: "#f44336" },
 };
 
 const columns = [
@@ -111,7 +104,7 @@ const columns = [
   },
   {
     id: "actions",
-    enableHiding: false,
+
     cell: ({ row }) => {
       const feedback = row.original;
 
@@ -150,16 +143,48 @@ export const Feedback = () => {
   const [selectedFeedback, setSelectedFeedback] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  console.log("set is dialog open", isDialogOpen);
   // Open feedback details dialog
   const openFeedbackDetails = (feedback) => {
     setSelectedFeedback(feedback);
     setIsDialogOpen(true);
   };
 
+  // Function to close the dialog (fixes pointer-events issue)
+  const handleClose = () => {
+    setIsDialogOpen(false);
+    setTimeout(() => {
+      document.body.style.pointerEvents = "auto";
+      document.body.style.overflow = "auto";
+    }, 50);
+  };
+
+  useEffect(() => {
+    if (!isDialogOpen) {
+      document.body.style.pointerEvents = "auto";
+      document.body.style.overflow = "auto";
+    }
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === "style") {
+          console.log("Body style changed:", document.body.style.cssText);
+          if (document.body.style.pointerEvents === "none") {
+            document.body.style.pointerEvents = "auto"; // Fix it immediately
+          }
+        }
+      });
+    });
+
+    observer.observe(document.body, { attributes: true });
+
+    return () => observer.disconnect();
+  }, [isDialogOpen]);
+
   const columns = [
     {
       accessorKey: "InsuranceId",
-      header: " name",
+      header: " Insurance ID",
       cell: ({ row }) => (
         <div className="font-medium">
           {row.original.userId?.insuranceId || "Unknown"}
@@ -275,18 +300,8 @@ export const Feedback = () => {
 
   const fetchfeedbackData = async () => {
     setLoading(true);
-    const token =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NDg0NzJlYWUwZmI3Y2RiZjcxOTBmYSIsInJvbGUiOiJDdXN0b21lciIsImlhdCI6MTczOTIwMzY3MCwiZXhwIjoxNzQxNzk1NjcwfQ.v338cBSy53nmwp5DTSUQZqDw49LwKWjwSfCEuQIkZcc";
     try {
-      const response = await axios.get(
-        "http://localhost:8000/v1/feedback/all",
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axiosInstance.get("/feedback/all");
       const feedbackList = response.data.data;
       const updatedFeedbackData = feedbackList.map((feedback) => ({
         ...feedback,
@@ -337,19 +352,24 @@ export const Feedback = () => {
 
     const doc = new jsPDF("p", "mm", "a4");
 
-    const companyName = "InsureGeini";
+    // Add Header with Stylish Design
     const logo = new Image();
     logo.src = "/images/logo.jpeg";
-    doc.addImage(logo, "JPEG", 150, 10, 50, 30);
+    doc.addImage(logo, "JPEG", 160, 10, 30, 25);
 
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(22);
-    doc.text(companyName, 14, 15);
-    doc.text(`${title} Report`, 14, 25);
+    doc.setFontSize(28);
+    doc.setTextColor(33, 150, 243);
+    doc.text("InsureGeini", 14, 20);
 
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`${title} Report`, 14, 30);
+
+ 
     doc.setFontSize(12);
     doc.setFont("helvetica", "normal");
-    doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 35);
+    doc.setTextColor(0, 0, 0);
 
     const formattedStartDate = startDate
       ? new Date(startDate).toLocaleDateString()
@@ -357,50 +377,41 @@ export const Feedback = () => {
     const formattedEndDate = endDate
       ? new Date(endDate).toLocaleDateString()
       : "N/A";
-    doc.text(`Date Range: ${formattedStartDate} - ${formattedEndDate}`, 14, 42);
+    doc.setFontSize(12);
+    doc.text("Generated on:", 14, 40);
+    doc.setFont("helvetica", "bold");
+    doc.text(new Date().toLocaleString(), 45, 40);
+
+    doc.setFont("helvetica", "normal");
+    doc.text("Date Range:", 14, 47);
+    doc.setFont("helvetica", "bold");
+    doc.text(`${formattedStartDate} to ${formattedEndDate}`, 45, 47);
 
     doc.setLineWidth(0.5);
-    doc.line(14, 46, 196, 46);
+    doc.line(14, 53, 196, 53);
 
-    let startY = 60;
+    let startY = 65;
 
-    let summaryData = [];
-    if (reportType === "sentiment") {
-      summaryData = [
-        ["Total Feedback", data.length],
-        ["Report Type", "Sentiment report"],
-      ];
-    } else if (reportType === "category") {
-      summaryData = [
-        ["Total Feedback", data.length],
-        ["Report Type", "Category report"],
-      ];
-    } else if (reportType === "sentiment-category") {
-      summaryData = [
-        ["Total Feedback", data.length],
-        ["Report Type", "Sentiment & Category report"],
-      ];
-    } else if (reportType === "sentiment-trends") {
-      summaryData = [
-        ["Total Feedback", data.length],
-        ["Report Type", "Sentiment Trends report"],
-      ];
-    }
-    // Summary Table
+    // Summary Table with Better Formatting
+    let summaryData = [
+      ["Total Feedback", data.length],
+      ["Report Type", `${title} Analysis`],
+    ];
+
     autoTable(doc, {
       startY: startY,
       body: summaryData,
       theme: "grid",
-      styles: { fontSize: 11, cellPadding: 6, fontStyle: "bold" },
+      styles: { fontSize: 12, cellPadding: 8, fontStyle: "bold" },
       columnStyles: {
-        0: { fillColor: [41, 128, 185], textColor: 255 },
+        0: { fillColor: [41, 128, 185], textColor: 255, fontStyle: "bold" },
         1: { fillColor: [236, 240, 241], fontStyle: "bold" },
       },
     });
 
     startY = doc.lastAutoTable.finalY + 10;
 
-    //Data Table
+    // Data Table with Alternating Row Colors
     let columns = [];
     let rows = [];
 
@@ -463,26 +474,31 @@ export const Feedback = () => {
       startY: startY,
       head: [columns],
       body: rows,
-      theme: "grid",
+      theme: "striped",
       styles: {
-        fontSize: 10,
-        cellPadding: 5,
+        fontSize: 11,
+        cellPadding: 6,
+        textColor: [0, 0, 0],
       },
       headStyles: {
-        fillColor: [52, 152, 219],
+        fillColor: [33, 150, 243],
         textColor: [255, 255, 255],
       },
       alternateRowStyles: { fillColor: [245, 245, 245] },
+      margin: { top: 10 },
     });
 
-    //
+    startY = doc.lastAutoTable.finalY + 10;
+
+    // Add Footer with Branding & Page Numbers
     const pageCount = doc.internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       doc.setFontSize(10);
       doc.setFont("helvetica", "italic");
+      doc.setTextColor(100);
       doc.text(`Page ${i} of ${pageCount}`, 180, 285);
-      doc.text("InsureGeini - Data Insights Report", 14, 285);
+      doc.text("© 2025 InsureGeini - Data Insights Report", 14, 285);
     }
 
     // Save and Download the PDF
@@ -591,20 +607,31 @@ export const Feedback = () => {
     );
     setFilteredSentimentData(selectedTrend);
   };
+  // Calculate total number of sentiments first
+  const totalSentiments = Object.values(
+    sentimentStats.sentimentCounts || {}
+  ).reduce((acc, curr) => acc + curr, 0);
+
 
   const sentimentPieData = Object.keys(
     sentimentStats.sentimentCounts || {}
-  ).map((key) => ({
-    name: key,
-    value: sentimentStats.sentimentCounts[key] || 0,
-    fill: chartConfig[key].color,
-  }));
+  ).map((key) => {
+    const value = sentimentStats.sentimentCounts[key] || 0;
+    const percentage = totalSentiments
+      ? ((value / totalSentiments) * 100).toFixed(1)
+      : 0;
+    return {
+      name: `${key} (${percentage}%) - `,
+      value,
+      fill: chartConfig[key].color,
+    };
+  });
 
   //Calculate total sentiments before using it in Label
-  const totalSentiments = sentimentPieData.reduce(
+  /*  const totalSentiments = sentimentPieData.reduce(
     (acc, curr) => acc + curr.value,
     0
-  );
+  ); */
 
   const categoryBarData = Object.keys(sentimentStats.categoryCounts || {}).map(
     (key) => ({
@@ -623,7 +650,12 @@ export const Feedback = () => {
   }));
 
   if (sentimentPieData.length === 0) {
-    sentimentPieData.push({ name: "No Data", value: 0 });
+    sentimentPieData.push({
+      name: "No Data",
+      value: 0,
+      percentage: 0,
+      fill: "#ccc",
+    });
   }
 
   if (categoryBarData.length === 0) {
@@ -694,7 +726,7 @@ export const Feedback = () => {
             {[
               {
                 title: "Total Feedback",
-                value: feedbackData.length,
+                value: filterDataByDate(feedbackData).length,
                 color: "bg-gradient-to-r from-blue-400 to-blue-600",
               },
 
@@ -829,40 +861,50 @@ export const Feedback = () => {
                           innerRadius={60}
                           strokeWidth={5}
                           animationDuration={2000}
+                          labelLine={false}
+                          cx="50%"
+                          cy="50%"
+                          paddingAngle={3}
                         >
+                          {/* Custom Labels for Percentages (outside the pie chart) */}
                           <Label
-                            content={({ viewBox }) => {
-                              if (
-                                viewBox &&
-                                "cx" in viewBox &&
-                                "cy" in viewBox
-                              ) {
-                                return (
-                                  <text
-                                    x={viewBox.cx}
-                                    y={viewBox.cy}
-                                    textAnchor="middle"
-                                    dominantBaseline="middle"
-                                  >
-                                    <tspan
-                                      x={viewBox.cx}
-                                      y={viewBox.cy}
-                                      className="fill-foreground text-3xl font-bold"
-                                    >
-                                      {totalSentiments.toLocaleString()}
-                                    </tspan>
-                                    <tspan
-                                      x={viewBox.cx}
-                                      y={(viewBox.cy || 0) + 24}
-                                      className="fill-muted-foreground"
-                                    >
-                                      Feedbacks
-                                    </tspan>
-                                  </text>
-                                );
-                              }
+                            content={({
+                              cx,
+                              cy,
+                              midAngle,
+                              outerRadius,
+                              index,
+                            }) => {
+                              if (!sentimentPieData[index]) return null; // Prevent undefined access
+                              const percentage =
+                                sentimentPieData[index].percentage;
+                              const RADIAN = Math.PI / 180;
+                              const x =
+                                cx +
+                                (outerRadius + 20) *
+                                  Math.cos(-midAngle * RADIAN);
+                              const y =
+                                cy +
+                                (outerRadius + 20) *
+                                  Math.sin(-midAngle * RADIAN);
+                              return (
+                                <text
+                                  x={x}
+                                  y={y}
+                                  fill="black"
+                                  textAnchor={x > cx ? "start" : "end"}
+                                  dominantBaseline="central"
+                                  fontSize={12}
+                                  fontWeight="bold"
+                                >
+                                  {`${percentage}%`}
+                                </text>
+                              );
                             }}
                           />
+                          {sentimentPieData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.fill} />
+                          ))}
                         </Pie>
                       </PieChart>
                     </ChartContainer>
@@ -1361,12 +1403,6 @@ export const Feedback = () => {
               </CardContent>
             </Card>
           </div>
-          {/* Feedback Details Dialog */}
-          <FeedbackDetailsDialog
-            selectedFeedback={selectedFeedback}
-            isDialogOpen={isDialogOpen}
-            setIsDialogOpen={setIsDialogOpen}
-          />
 
           {/* Recent Feedback Table */}
           <div className="pt-3 bg-gradient-to-b from-white to-gray-100 shadow-md rounded-xl p-4">
@@ -1378,6 +1414,12 @@ export const Feedback = () => {
               data={filterDataByDate(feedbackData)}
               columns={columns}
               searchBy={["InsuranceId", "category", "sentiment", "feedback"]}
+            />
+            {/* Feedback Details Dialog */}
+            <FeedbackDetailsDialog
+              selectedFeedback={selectedFeedback}
+              isDialogOpen={isDialogOpen}
+              onClose={handleClose}
             />
           </div>
         </>
