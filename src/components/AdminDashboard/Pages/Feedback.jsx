@@ -52,6 +52,7 @@ import { Progress } from "@/components/ui/progress";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const chartConfig = {
   positive: { label: "positive", color: "#4caf50" },
@@ -300,6 +301,7 @@ export const Feedback = () => {
 
   const fetchfeedbackData = async () => {
     setLoading(true);
+    setChartLoading(true);
     try {
       const response = await axiosInstance.get("/feedback/all");
       const feedbackList = response.data.data;
@@ -309,11 +311,14 @@ export const Feedback = () => {
       }));
 
       setTimeout(() => {
-        setLoading(false), setFeedbackData(updatedFeedbackData);
+        setLoading(false),
+          setFeedbackData(updatedFeedbackData),
+          setChartLoading(false);
       }, 500);
     } catch (error) {
       console.error(error);
       setLoading(false);
+      setChartLoading(false);
     }
   };
 
@@ -366,7 +371,6 @@ export const Feedback = () => {
     doc.setTextColor(0, 0, 0);
     doc.text(`${title} Report`, 14, 30);
 
- 
     doc.setFontSize(12);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(0, 0, 0);
@@ -409,65 +413,132 @@ export const Feedback = () => {
       },
     });
 
-    startY = doc.lastAutoTable.finalY + 10;
+    startY = doc.lastAutoTable.finalY + 20;
+
+    const totalFeedback = data.length;
 
     // Data Table with Alternating Row Colors
     let columns = [];
     let rows = [];
+    // Ensure we have data before calculating percentages
+    if (totalFeedback === 0) {
+      rows = [["No Data Available", "-", "-"]];
+    } else {
+      if (reportType === "sentiment") {
+        columns = ["Sentiment", "Count", "Percentage"];
+        const sentimentCounts = data.reduce((acc, item) => {
+          acc[item.sentiment] = (acc[item.sentiment] || 0) + 1;
+          return acc;
+        }, {});
+        rows = Object.keys(sentimentCounts).map((key) => [
+          key,
+          sentimentCounts[key],
+          `${((sentimentCounts[key] / totalFeedback) * 100).toFixed(1)}%`, // Calculate percentage
+        ]);
+      } else if (reportType === "category") {
+        columns = ["Category", "Count", "Percentage"];
+        const categoryCounts = data.reduce((acc, item) => {
+          acc[item.category] = (acc[item.category] || 0) + 1;
+          return acc;
+        }, {});
+        rows = Object.keys(categoryCounts).map((key) => [
+          key,
+          categoryCounts[key],
+          `${((categoryCounts[key] / totalFeedback) * 100).toFixed(1)}%`, // Calculate percentage
+        ]);
+      } else if (reportType === "sentiment-category") {
+        columns = [
+          "Category",
+          "Positive",
+          "Positive%",
+          "Neutral",
+          "Neutral%",
+          "Negative",
+          "Negative%",
+        ];
+        const categorySentiments = data.reduce((acc, item) => {
+          if (!acc[item.category]) {
+            acc[item.category] = { positive: 0, neutral: 0, negative: 0 };
+          }
+          acc[item.category][item.sentiment]++;
+          return acc;
+        }, {});
+        rows = Object.keys(categorySentiments).map((category) => {
+          const totalCategoryCount =
+            categorySentiments[category].positive +
+            categorySentiments[category].neutral +
+            categorySentiments[category].negative;
 
-    if (reportType === "sentiment") {
-      columns = ["Sentiment", "Count"];
-      const sentimentCounts = data.reduce((acc, item) => {
-        acc[item.sentiment] = (acc[item.sentiment] || 0) + 1;
-        return acc;
-      }, {});
-      rows = Object.keys(sentimentCounts).map((key) => [
-        key,
-        sentimentCounts[key],
-      ]);
-    } else if (reportType === "category") {
-      columns = ["Category", "Count"];
-      const categoryCounts = data.reduce((acc, item) => {
-        acc[item.category] = (acc[item.category] || 0) + 1;
-        return acc;
-      }, {});
-      rows = Object.keys(categoryCounts).map((key) => [
-        key,
-        categoryCounts[key],
-      ]);
-    } else if (reportType === "sentiment-category") {
-      columns = ["Category", "Positive", "Neutral", "Negative"];
-      const categorySentiments = data.reduce((acc, item) => {
-        if (!acc[item.category]) {
-          acc[item.category] = { positive: 0, neutral: 0, negative: 0 };
-        }
-        acc[item.category][item.sentiment]++;
-        return acc;
-      }, {});
-      rows = Object.keys(categorySentiments).map((category) => [
-        category,
-        categorySentiments[category].positive || 0,
-        categorySentiments[category].neutral || 0,
-        categorySentiments[category].negative || 0,
-      ]);
-    } else if (reportType === "sentiment-trends") {
-      columns = ["Month", "Positive", "Neutral", "Negative"];
-      const trends = {};
-      data.forEach((item) => {
-        const month = new Date(item.createdAt).toLocaleString("en-US", {
-          month: "short",
+          return [
+            category,
+            categorySentiments[category].positive,
+            `${(
+              (categorySentiments[category].positive / totalCategoryCount) *
+              100
+            ).toFixed(1)}%`,
+            categorySentiments[category].neutral,
+            `${(
+              (categorySentiments[category].neutral / totalCategoryCount) *
+              100
+            ).toFixed(1)}%`,
+            categorySentiments[category].negative,
+            `${(
+              (categorySentiments[category].negative / totalCategoryCount) *
+              100
+            ).toFixed(1)}%`,
+          ];
         });
-        if (!trends[month]) {
-          trends[month] = { positive: 0, neutral: 0, negative: 0 };
-        }
-        trends[month][item.sentiment]++;
-      });
-      rows = Object.keys(trends).map((month) => [
-        month,
-        trends[month].positive || 0,
-        trends[month].neutral || 0,
-        trends[month].negative || 0,
-      ]);
+      } else if (reportType === "sentiment-trends") {
+        columns = [
+          "Month",
+          "Positive",
+          "Positive %",
+          "Neutral",
+          "Neutral %",
+          "Negative",
+          "Negative %",
+        ];
+        const trends = {};
+        data.forEach((item) => {
+          const month = new Date(item.createdAt).toLocaleString("en-US", {
+            month: "short",
+          });
+          if (!trends[month]) {
+            trends[month] = { positive: 0, neutral: 0, negative: 0 };
+          }
+          trends[month][item.sentiment]++;
+        });
+        rows = Object.keys(trends)
+          .sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b)) // Sort by month order
+          .map((month) => {
+            const totalForMonth =
+              trends[month].positive +
+              trends[month].neutral +
+              trends[month].negative;
+
+            return [
+              month,
+              trends[month].positive, // Positive Count
+              `${
+                totalForMonth > 0
+                  ? ((trends[month].positive / totalForMonth) * 100).toFixed(1)
+                  : "0.0"
+              }%`, // Positive Percentage
+              trends[month].neutral, // Neutral Count
+              `${
+                totalForMonth > 0
+                  ? ((trends[month].neutral / totalForMonth) * 100).toFixed(1)
+                  : "0.0"
+              }%`, // Neutral Percentage
+              trends[month].negative, // Negative Count
+              `${
+                totalForMonth > 0
+                  ? ((trends[month].negative / totalForMonth) * 100).toFixed(1)
+                  : "0.0"
+              }%`, // Negative Percentage
+            ];
+          });
+      }
     }
 
     autoTable(doc, {
@@ -476,9 +547,10 @@ export const Feedback = () => {
       body: rows,
       theme: "striped",
       styles: {
-        fontSize: 11,
-        cellPadding: 6,
+        fontSize: 10,
+        cellPadding: 3,
         textColor: [0, 0, 0],
+        halign: "center",
       },
       headStyles: {
         fillColor: [33, 150, 243],
@@ -612,7 +684,6 @@ export const Feedback = () => {
     sentimentStats.sentimentCounts || {}
   ).reduce((acc, curr) => acc + curr, 0);
 
-
   const sentimentPieData = Object.keys(
     sentimentStats.sentimentCounts || {}
   ).map((key) => {
@@ -662,6 +733,12 @@ export const Feedback = () => {
     categoryBarData.push({ category: "No Data", count: 0 });
   }
 
+  const ChartSkeleton = () => (
+    <div className="flex justify-center items-center h-full">
+      <Skeleton className="w-full h-[250px] rounded-md" />
+    </div>
+  );
+
   return (
     <div className="flex flex-col gap-4 pr-4 bg-gray-100 min-h-screen p-6 rounded-lg">
       {loading ? (
@@ -677,7 +754,7 @@ export const Feedback = () => {
             </h2>
 
             {/* Date Range */}
-            <div className="flex items-center gap-4 w-full md:w-auto">
+            <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
               <div className="relative w-full">
                 <DatePicker
                   selected={startDate}
@@ -722,14 +799,13 @@ export const Feedback = () => {
           </div>
 
           {/* KPI Cards */}
-          <div className="grid grid-flow-col gap-4 py-2 overflow-hidden ">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 py-2 overflow-hidden">
             {[
               {
                 title: "Total Feedback",
                 value: filterDataByDate(feedbackData).length,
                 color: "bg-gradient-to-r from-blue-400 to-blue-600",
               },
-
               {
                 title: "Positive",
                 value: sentimentStats.sentimentCounts?.positive || 0,
@@ -747,6 +823,7 @@ export const Feedback = () => {
               },
             ].map((item, index) => (
               <Card
+                key={index}
                 className={`${item.color} shadow-lg rounded-2xl hover:scale-105 transition-transform duration-100 text-white`}
               >
                 <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
@@ -784,7 +861,7 @@ export const Feedback = () => {
           </div>
 
           {/* Charts */}
-          <div className="grid grid-cols-2 gap-4 overflow-hidden ">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-hidden">
             <Card className="bg-gradient-to-b from-white to-gray-100 shadow-md p-4 rounded-2xl">
               <CardHeader className="flex flex-wrap flex-row justify-between">
                 <h2 className="mb-4 text-xl font-semibold text-gray-800">
@@ -840,8 +917,10 @@ export const Feedback = () => {
                 </button>
               </CardHeader>
               <CardContent className="h-[300px] flex justify-center items-center">
-                {sentimentPieData.length === 0 ||
-                sentimentPieData[0].value === 0 ? (
+                {chartLoading ? (
+                  <ChartSkeleton />
+                ) : sentimentPieData.length === 0 ||
+                  sentimentPieData[0].value === 0 ? (
                   <p className="text-gray-500 text-lg">
                     No sentiment data available.
                   </p>
@@ -913,7 +992,7 @@ export const Feedback = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-b from-white to-gray-100 shadow-md p-4 rounded-2xl ">
+            <Card className="bg-gradient-to-b from-white to-gray-100 shadow-md p-4 rounded-2xl">
               <CardHeader className="flex flex-wrap flex-row justify-between">
                 <h2 className="mb-4 text-xl font-semibold text-gray-800 w-full md:w-auto">
                   Feedback by Category
@@ -968,7 +1047,14 @@ export const Feedback = () => {
                 </button>
               </CardHeader>
               <CardContent className="h-[300px] flex justify-center items-center">
-                {categoryBarData.length > 0 ? (
+                {chartLoading ? (
+                  <ChartSkeleton />
+                ) : categoryBarData.length === 0 ||
+                  categoryBarData[0].value === 0 ? (
+                  <p className="text-gray-500 text-lg">
+                    No sentiment data available.
+                  </p>
+                ) : (
                   <ResponsiveContainer width="100%" height="100%">
                     <ChartContainer
                       className="overflow-hidden"
@@ -996,195 +1082,147 @@ export const Feedback = () => {
                       </BarChart>
                     </ChartContainer>
                   </ResponsiveContainer>
-                ) : (
-                  <p className="text-gray-500 text-lg">
-                    No category data available.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-            <Card className="bg-white shadow-lg p-6 rounded-2xl transition-all">
-              <CardHeader className="flex flex-wrap flex-row justify-between items-center">
-                <h2 className="mb-4 text-xl font-bold text-gray-800 ">
-                  Feedback by Sentiment & Category
-                </h2>
-                <button
-                  className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-lg hover:scale-105 transition-transform"
-                  onClick={handleSubmit(() => {
-                    try {
-                      // Call the function to generate the PDF
-                      downloadReportAsPDF(
-                        filterDataByDate(feedbackData),
-                        "Sentiment & Category",
-                        "sentiment-category",
-                        startDate,
-                        endDate
-                      );
-
-                      // Show success message
-                      Swal.fire({
-                        title: "✅ Download Complete!",
-                        text: "Your Sentiment & Category report has been successfully generated and saved.",
-                        icon: "success",
-                        background: "#fff",
-                        color: "#065f46",
-                        confirmButtonColor: "#059669",
-                        confirmButtonText: "Great!",
-                        showClass: {
-                          popup: "animate__animated animate__zoomIn",
-                        },
-                        hideClass: {
-                          popup: "animate__animated animate__fadeOutUp",
-                        },
-                      });
-                    } catch (error) {
-                      // Show error message
-                      Swal.fire({
-                        title: "❌ Validation Error",
-                        text: error.message,
-                        icon: "error",
-                        background: "#fee2e2",
-                        color: "#b91c1c",
-                        confirmButtonColor: "#dc2626",
-                        confirmButtonText: "Try Again",
-                        showClass: {
-                          popup: "animate__animated animate__shakeX",
-                        },
-                      });
-                    }
-                  })}
-                >
-                  <Download className="inline-block mr-2" size={18} /> Download
-                  Report
-                </button>
-              </CardHeader>
-
-              <CardContent className="h-[400px] flex justify-center items-center">
-                {categorySentimentChartData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={categorySentimentChartData}
-                      margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
-                      barCategoryGap={20}
-                      barGap={8}
-                    >
-                      <CartesianGrid
-                        strokeDasharray="3 3"
-                        strokeOpacity={0.3}
-                      />
-                      <XAxis
-                        dataKey="category"
-                        tick={{ fontSize: 14, fontWeight: "bold" }}
-                        tickLine={false}
-                        axisLine={false}
-                      />
-                      <YAxis />
-                      <Tooltip
-                        cursor={{ fill: "#f5f5f5" }}
-                        contentStyle={{
-                          borderRadius: "8px",
-                          backgroundColor: "rgba(0, 0, 0, 0.7)",
-                          color: "#fff",
-                          padding: "10px",
-                        }}
-                      />
-                      <Legend verticalAlign="top" iconSize={16} />
-
-                      {/* Custom Gradients */}
-                      <defs>
-                        <linearGradient
-                          id="positiveGradient"
-                          x1="0"
-                          y1="0"
-                          x2="0"
-                          y2="1"
-                        >
-                          <stop
-                            offset="0%"
-                            stopColor="#4caf50"
-                            stopOpacity={0.9}
-                          />
-                          <stop
-                            offset="100%"
-                            stopColor="#4caf50"
-                            stopOpacity={0.5}
-                          />
-                        </linearGradient>
-                        <linearGradient
-                          id="neutralGradient"
-                          x1="0"
-                          y1="0"
-                          x2="0"
-                          y2="1"
-                        >
-                          <stop
-                            offset="0%"
-                            stopColor="#ffeb3b"
-                            stopOpacity={0.9}
-                          />
-                          <stop
-                            offset="100%"
-                            stopColor="#ffeb3b"
-                            stopOpacity={0.5}
-                          />
-                        </linearGradient>
-                        <linearGradient
-                          id="negativeGradient"
-                          x1="0"
-                          y1="0"
-                          x2="0"
-                          y2="1"
-                        >
-                          <stop
-                            offset="0%"
-                            stopColor="#f44336"
-                            stopOpacity={0.9}
-                          />
-                          <stop
-                            offset="100%"
-                            stopColor="#f44336"
-                            stopOpacity={0.5}
-                          />
-                        </linearGradient>
-                      </defs>
-
-                      <Bar
-                        dataKey="Positive"
-                        fill="url(#positiveGradient)"
-                        radius={[8, 8, 0, 0]}
-                        animationDuration={1200}
-                        barSize={30}
-                      />
-                      <Bar
-                        dataKey="Neutral"
-                        fill="url(#neutralGradient)"
-                        radius={[8, 8, 0, 0]}
-                        animationDuration={1400}
-                        barSize={30}
-                      />
-                      <Bar
-                        dataKey="Negative"
-                        fill="url(#negativeGradient)"
-                        radius={[8, 8, 0, 0]}
-                        animationDuration={1600}
-                        barSize={30}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <p className="text-gray-500 text-lg">
-                    No sentiment-category data available.
-                  </p>
                 )}
               </CardContent>
             </Card>
 
             <Card className="bg-white shadow-lg p-6 rounded-2xl transition-all">
-              <CardHeader className="flex flex-wrap flex-row justify-between items-center">
-                <h2 className="md-4 text-xl font-bold text-gray-800">
+            <CardHeader className="flex flex-wrap flex-col md:flex-row justify-between items-center">
+    <h2 className="mb-4 text-xl font-bold text-gray-800">
+      Feedback by Sentiment & Category
+    </h2>
+    <button
+      className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-lg hover:scale-105 transition-transform"
+      onClick={handleSubmit(() => {
+        try {
+          // Call the function to generate the PDF
+          downloadReportAsPDF(
+            filterDataByDate(feedbackData),
+            "Sentiment & Category",
+            "sentiment-category",
+            startDate,
+            endDate
+          );
+
+          // Show success message
+          Swal.fire({
+            title: "✅ Download Complete!",
+            text: "Your Sentiment & Category report has been successfully generated and saved.",
+            icon: "success",
+            background: "#fff",
+            color: "#065f46",
+            confirmButtonColor: "#059669",
+            confirmButtonText: "Great!",
+            showClass: {
+              popup: "animate__animated animate__zoomIn",
+            },
+            hideClass: {
+              popup: "animate__animated animate__fadeOutUp",
+            },
+          });
+        } catch (error) {
+          // Show error message
+          Swal.fire({
+            title: "❌ Validation Error",
+            text: error.message,
+            icon: "error",
+            background: "#fee2e2",
+            color: "#b91c1c",
+            confirmButtonColor: "#dc2626",
+            confirmButtonText: "Try Again",
+            showClass: {
+              popup: "animate__animated animate__shakeX",
+            },
+          });
+        }
+      })}
+    >
+      <Download className="inline-block mr-2" size={18} /> Download Report
+    </button>
+  </CardHeader>
+
+  <CardContent className="h-[400px] flex justify-center items-center">
+    {chartLoading ? (
+      <ChartSkeleton />
+    ) : categorySentimentChartData.length === 0 ||
+      categorySentimentChartData[0].value === 0 ? (
+      <p className="text-gray-500 text-lg">No sentiment data available.</p>
+    ) : (
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={categorySentimentChartData}
+          margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
+          barCategoryGap={20}
+          barGap={8}
+        >
+          <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
+          <XAxis
+            dataKey="category"
+            tick={{ fontSize: 14, fontWeight: "bold" }}
+            tickLine={false}
+            axisLine={false}
+          />
+          <YAxis />
+          <Tooltip
+            cursor={{ fill: "#f5f5f5" }}
+            contentStyle={{
+              borderRadius: "8px",
+              backgroundColor: "rgba(0, 0, 0, 0.7)",
+              color: "#fff",
+              padding: "10px",
+            }}
+          />
+          <Legend verticalAlign="top" iconSize={16} />
+
+          {/* Custom Gradients */}
+          <defs>
+            <linearGradient id="positiveGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#4caf50" stopOpacity={0.9} />
+              <stop offset="100%" stopColor="#4caf50" stopOpacity={0.5} />
+            </linearGradient>
+            <linearGradient id="neutralGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#ffeb3b" stopOpacity={0.9} />
+              <stop offset="100%" stopColor="#ffeb3b" stopOpacity={0.5} />
+            </linearGradient>
+            <linearGradient id="negativeGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#f44336" stopOpacity={0.9} />
+              <stop offset="100%" stopColor="#f44336" stopOpacity={0.5} />
+            </linearGradient>
+          </defs>
+
+          <Bar
+            dataKey="Positive"
+            fill="url(#positiveGradient)"
+            radius={[8, 8, 0, 0]}
+            animationDuration={1200}
+            barSize={30}
+          />
+          <Bar
+            dataKey="Neutral"
+            fill="url(#neutralGradient)"
+            radius={[8, 8, 0, 0]}
+            animationDuration={1400}
+            barSize={30}
+          />
+          <Bar
+            dataKey="Negative"
+            fill="url(#negativeGradient)"
+            radius={[8, 8, 0, 0]}
+            animationDuration={1600}
+            barSize={30}
+          />
+        </BarChart>
+      </ResponsiveContainer>
+    )}
+  </CardContent>
+            </Card>
+
+            <Card className="bg-white shadow-lg p-6 rounded-2xl transition-all">
+              <CardHeader className="flex flex-wrap flex-col md:flex-row justify-between items-center">
+                <h2 className="mb-4 text-xl font-bold text-gray-800">
                   Sentiment Trends by Category
                 </h2>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col md:flex-row items-center gap-2">
                   <button
                     className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-lg hover:scale-105 transition-transform"
                     onClick={handleSubmit(() => {
@@ -1267,7 +1305,14 @@ export const Feedback = () => {
               </CardHeader>
 
               <CardContent className="h-[400px] flex justify-center items-center">
-                {filteredSentimentData.length > 0 ? (
+                {chartLoading ? (
+                  <ChartSkeleton />
+                ) : sentimentPieData.length === 0 ||
+                  sentimentPieData[0].value === 0 ? (
+                  <p className="text-gray-500 text-lg">
+                    No sentiment data available.
+                  </p>
+                ) : (
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart
                       data={filteredSentimentData}
@@ -1395,10 +1440,6 @@ export const Feedback = () => {
                       />
                     </AreaChart>
                   </ResponsiveContainer>
-                ) : (
-                  <p className="text-gray-500 text-lg">
-                    No trend data available.
-                  </p>
                 )}
               </CardContent>
             </Card>
