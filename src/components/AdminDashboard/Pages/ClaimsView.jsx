@@ -52,6 +52,32 @@ export default function ClaimDetails() {
   const [submitLoading, setSubmitLoading] = useState(false);
   const queryClient = useQueryClient();
 
+  // // Submit form data
+  const fraudApproveForm = useForm({
+    resolver: zodResolver(fraudApproveSchema),
+    defaultValues: {
+      claimId: id,
+      status: "",
+    },
+  });
+
+  const mutation = useMutation({
+    mutationFn: async (data) => {
+      try {
+        setSubmitLoading(true); // Prevent multiple submissions
+        const response = await fraudApprove(data);
+        toast.success("Submitted successfully");
+        queryClient.invalidateQueries({ queryKey: ["staff"] });
+        fraudApproveForm.reset();
+        return response;
+      } catch (error) {
+        toast.error("Error occurred");
+      } finally {
+        setSubmitLoading(false);
+      }
+    },
+  });
+
   //! Data Get Queries ===>
   const {
     data: claim,
@@ -100,32 +126,6 @@ export default function ClaimDetails() {
         Failed to load claim details.
       </div>
     );
-
-  // // Submit form data
-  const fraudApproveForm = useForm({
-    resolver: zodResolver(fraudApproveSchema),
-    defaultValues: {
-      claimId: id,
-      status: "",
-    },
-  });
-
-  const mutation = useMutation({
-    mutationFn: async (data) => {
-      try {
-        setSubmitLoading(true); // Prevent multiple submissions
-        const response = await fraudApprove(data);
-        toast.success("Submitted successfully");
-        queryClient.invalidateQueries({ queryKey: ["staff"] });
-        fraudApproveForm.reset();
-        return response;
-      } catch (error) {
-        toast.error("Error occurred");
-      } finally {
-        setSubmitLoading(false);
-      }
-    },
-  });
 
   const onSubmit = (data) => {
     setSubmitLoading(true);
@@ -851,7 +851,7 @@ export default function ClaimDetails() {
 
       <Form {...fraudApproveForm}>
         <form
-          className="flex gap-4 items-center w-full"
+          className="flex gap-4 items-center pr-12 w-full"
           onSubmit={fraudApproveForm.handleSubmit(onSubmit)}
         >
           <div className="flex items-center gap-2 flex-1 min-w-[300px]">
