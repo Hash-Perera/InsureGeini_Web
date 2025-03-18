@@ -27,11 +27,10 @@ export const fraudCompare = async (id) => {
   }
 };
 
-export const fraudApprove = async (id) => {
+export const fraudApprove = async (data) => {
   try {
-    console.log("Fraud Appro");
-    // const response = await axiosInstance.get(`/claims/approveFraud/${id}`);
-    // return response.data;
+    const response = await axiosInstance.post(`/claims/fraudApprove`, data);
+    return response.data;
   } catch (error) {
     throw error;
   }

@@ -64,7 +64,7 @@ export default function ClaimDetails() {
   const mutation = useMutation({
     mutationFn: async (data) => {
       try {
-        setSubmitLoading(true); // Prevent multiple submissions
+        setSubmitLoading(true);
         const response = await fraudApprove(data);
         toast.success("Submitted successfully");
         queryClient.invalidateQueries({ queryKey: ["staff"] });
@@ -437,6 +437,32 @@ export default function ClaimDetails() {
         {/* Vehicle Details ================================================================================================================================= */}
         <div className="p-6 mb-6 bg-white rounded-xl shadow-lg">
           {/* Section Header with Icon */}
+
+          {claim?.data?.fraud_verification ? (
+            <div className="p-4 bg-gray-50 mt-4 mb-5">
+              <h2 className="text-lg font-semibold text-gray-800">
+                Fraud Verification Results
+              </h2>
+
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-3 ">
+                {Object.entries(claim?.data?.fraud_verification).map(
+                  ([key, value], index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      {value ? (
+                        <CheckCircle className="text-green-500" size={18} />
+                      ) : (
+                        <XCircle className="text-red-500" size={18} />
+                      )}
+                      <p className="text-sm text-gray-700 capitalize">
+                        {key.replace(/_/g, " ")}
+                      </p>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+          ) : null}
+
           <h3 className="flex gap-2 items-center text-2xl font-semibold text-gray-800">
             <Car className="text-blue-600" size={24} />
             Vehicle Details
