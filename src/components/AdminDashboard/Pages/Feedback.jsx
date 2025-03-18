@@ -864,8 +864,8 @@ export const Feedback = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-hidden">
             <Card className="bg-gradient-to-b from-white to-gray-100 shadow-md p-4 rounded-2xl">
               <CardHeader className="flex flex-wrap flex-row justify-between">
-                <h2 className="mb-4 text-xl font-semibold text-gray-800">
-                  Feedback by Sentiment
+                <h2 className="mt-2 text-base font-semibold text-gray-800">
+                  Feedbacks by Sentiment
                 </h2>
                 <button
                   className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-lg hover:scale-105 transition-transform"
@@ -994,8 +994,8 @@ export const Feedback = () => {
 
             <Card className="bg-gradient-to-b from-white to-gray-100 shadow-md p-4 rounded-2xl">
               <CardHeader className="flex flex-wrap flex-row justify-between">
-                <h2 className="mb-4 text-xl font-semibold text-gray-800 w-full md:w-auto">
-                  Feedback by Category
+                <h2 className="mt-2 text-base font-semibold text-gray-800 w-full md:w-auto">
+                  Feedbacks by Category
                 </h2>
                 <button
                   className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-lg hover:scale-105 transition-transform"
@@ -1052,7 +1052,7 @@ export const Feedback = () => {
                 ) : categoryBarData.length === 0 ||
                   categoryBarData[0].value === 0 ? (
                   <p className="text-gray-500 text-lg">
-                    No sentiment data available.
+                    No category data available.
                   </p>
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
@@ -1087,142 +1087,190 @@ export const Feedback = () => {
             </Card>
 
             <Card className="bg-white shadow-lg p-6 rounded-2xl transition-all">
-            <CardHeader className="flex flex-wrap flex-col md:flex-row justify-between items-center">
-    <h2 className="mb-4 text-xl font-bold text-gray-800">
-      Feedback by Sentiment & Category
-    </h2>
-    <button
-      className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-lg hover:scale-105 transition-transform"
-      onClick={handleSubmit(() => {
-        try {
-          // Call the function to generate the PDF
-          downloadReportAsPDF(
-            filterDataByDate(feedbackData),
-            "Sentiment & Category",
-            "sentiment-category",
-            startDate,
-            endDate
-          );
+              <CardHeader className="flex flex-wrap flex-row justify-between items-center">
+                <h2 className="md-4 text-base font-semibold text-gray-800 ">
+                  Feedbacks by Sentiment & Category
+                </h2>
+                <button
+                  className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-lg hover:scale-105 transition-transform"
+                  onClick={handleSubmit(() => {
+                    try {
+                      // Call the function to generate the PDF
+                      downloadReportAsPDF(
+                        filterDataByDate(feedbackData),
+                        "Sentiment & Category",
+                        "sentiment-category",
+                        startDate,
+                        endDate
+                      );
 
-          // Show success message
-          Swal.fire({
-            title: "✅ Download Complete!",
-            text: "Your Sentiment & Category report has been successfully generated and saved.",
-            icon: "success",
-            background: "#fff",
-            color: "#065f46",
-            confirmButtonColor: "#059669",
-            confirmButtonText: "Great!",
-            showClass: {
-              popup: "animate__animated animate__zoomIn",
-            },
-            hideClass: {
-              popup: "animate__animated animate__fadeOutUp",
-            },
-          });
-        } catch (error) {
-          // Show error message
-          Swal.fire({
-            title: "❌ Validation Error",
-            text: error.message,
-            icon: "error",
-            background: "#fee2e2",
-            color: "#b91c1c",
-            confirmButtonColor: "#dc2626",
-            confirmButtonText: "Try Again",
-            showClass: {
-              popup: "animate__animated animate__shakeX",
-            },
-          });
-        }
-      })}
-    >
-      <Download className="inline-block mr-2" size={18} /> Download Report
-    </button>
-  </CardHeader>
+                      // Show success message
+                      Swal.fire({
+                        title: "✅ Download Complete!",
+                        text: "Your Sentiment & Category report has been successfully generated and saved.",
+                        icon: "success",
+                        background: "#fff",
+                        color: "#065f46",
+                        confirmButtonColor: "#059669",
+                        confirmButtonText: "Great!",
+                        showClass: {
+                          popup: "animate__animated animate__zoomIn",
+                        },
+                        hideClass: {
+                          popup: "animate__animated animate__fadeOutUp",
+                        },
+                      });
+                    } catch (error) {
+                      // Show error message
+                      Swal.fire({
+                        title: "❌ Validation Error",
+                        text: error.message,
+                        icon: "error",
+                        background: "#fee2e2",
+                        color: "#b91c1c",
+                        confirmButtonColor: "#dc2626",
+                        confirmButtonText: "Try Again",
+                        showClass: {
+                          popup: "animate__animated animate__shakeX",
+                        },
+                      });
+                    }
+                  })}
+                >
+                  <Download className="inline-block mr-2" size={18} /> Download
+                  Report
+                </button>
+              </CardHeader>
 
-  <CardContent className="h-[400px] flex justify-center items-center">
-    {chartLoading ? (
-      <ChartSkeleton />
-    ) : categorySentimentChartData.length === 0 ||
-      categorySentimentChartData[0].value === 0 ? (
-      <p className="text-gray-500 text-lg">No sentiment data available.</p>
-    ) : (
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart
-          data={categorySentimentChartData}
-          margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
-          barCategoryGap={20}
-          barGap={8}
-        >
-          <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
-          <XAxis
-            dataKey="category"
-            tick={{ fontSize: 14, fontWeight: "bold" }}
-            tickLine={false}
-            axisLine={false}
-          />
-          <YAxis />
-          <Tooltip
-            cursor={{ fill: "#f5f5f5" }}
-            contentStyle={{
-              borderRadius: "8px",
-              backgroundColor: "rgba(0, 0, 0, 0.7)",
-              color: "#fff",
-              padding: "10px",
-            }}
-          />
-          <Legend verticalAlign="top" iconSize={16} />
+              <CardContent className="h-[400px] flex justify-center items-center">
+                {chartLoading ? (
+                  <ChartSkeleton />
+                ) : categorySentimentChartData.length === 0 ||
+                  categorySentimentChartData[0].value === 0 ? (
+                  <p className="text-gray-500 text-lg">
+                    No category sentiment data available.
+                  </p>
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={categorySentimentChartData}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
+                      barCategoryGap={20}
+                      barGap={8}
+                    >
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        strokeOpacity={0.3}
+                      />
+                      <XAxis
+                        dataKey="category"
+                        tick={{ fontSize: 14, fontWeight: "bold" }}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <YAxis />
+                      <Tooltip
+                        cursor={{ fill: "#f5f5f5" }}
+                        contentStyle={{
+                          borderRadius: "8px",
+                          backgroundColor: "rgba(0, 0, 0, 0.7)",
+                          color: "#fff",
+                          padding: "10px",
+                        }}
+                      />
+                      <Legend verticalAlign="top" iconSize={16} />
 
-          {/* Custom Gradients */}
-          <defs>
-            <linearGradient id="positiveGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#4caf50" stopOpacity={0.9} />
-              <stop offset="100%" stopColor="#4caf50" stopOpacity={0.5} />
-            </linearGradient>
-            <linearGradient id="neutralGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#ffeb3b" stopOpacity={0.9} />
-              <stop offset="100%" stopColor="#ffeb3b" stopOpacity={0.5} />
-            </linearGradient>
-            <linearGradient id="negativeGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#f44336" stopOpacity={0.9} />
-              <stop offset="100%" stopColor="#f44336" stopOpacity={0.5} />
-            </linearGradient>
-          </defs>
+                      {/* Custom Gradients */}
+                      <defs>
+                        <linearGradient
+                          id="positiveGradient"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="0%"
+                            stopColor="#4caf50"
+                            stopOpacity={0.9}
+                          />
+                          <stop
+                            offset="100%"
+                            stopColor="#4caf50"
+                            stopOpacity={0.5}
+                          />
+                        </linearGradient>
+                        <linearGradient
+                          id="neutralGradient"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="0%"
+                            stopColor="#ffeb3b"
+                            stopOpacity={0.9}
+                          />
+                          <stop
+                            offset="100%"
+                            stopColor="#ffeb3b"
+                            stopOpacity={0.5}
+                          />
+                        </linearGradient>
+                        <linearGradient
+                          id="negativeGradient"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="0%"
+                            stopColor="#f44336"
+                            stopOpacity={0.9}
+                          />
+                          <stop
+                            offset="100%"
+                            stopColor="#f44336"
+                            stopOpacity={0.5}
+                          />
+                        </linearGradient>
+                      </defs>
 
-          <Bar
-            dataKey="Positive"
-            fill="url(#positiveGradient)"
-            radius={[8, 8, 0, 0]}
-            animationDuration={1200}
-            barSize={30}
-          />
-          <Bar
-            dataKey="Neutral"
-            fill="url(#neutralGradient)"
-            radius={[8, 8, 0, 0]}
-            animationDuration={1400}
-            barSize={30}
-          />
-          <Bar
-            dataKey="Negative"
-            fill="url(#negativeGradient)"
-            radius={[8, 8, 0, 0]}
-            animationDuration={1600}
-            barSize={30}
-          />
-        </BarChart>
-      </ResponsiveContainer>
-    )}
-  </CardContent>
+                      <Bar
+                        dataKey="Positive"
+                        fill="url(#positiveGradient)"
+                        radius={[8, 8, 0, 0]}
+                        animationDuration={1200}
+                        barSize={30}
+                      />
+                      <Bar
+                        dataKey="Neutral"
+                        fill="url(#neutralGradient)"
+                        radius={[8, 8, 0, 0]}
+                        animationDuration={1400}
+                        barSize={30}
+                      />
+                      <Bar
+                        dataKey="Negative"
+                        fill="url(#negativeGradient)"
+                        radius={[8, 8, 0, 0]}
+                        animationDuration={1600}
+                        barSize={30}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
+              </CardContent>
             </Card>
 
             <Card className="bg-white shadow-lg p-6 rounded-2xl transition-all">
-              <CardHeader className="flex flex-wrap flex-col md:flex-row justify-between items-center">
-                <h2 className="mb-4 text-xl font-bold text-gray-800">
+              <CardHeader className="flex flex-wrap flex-row justify-between items-center">
+                <h2 className="md-4 text-base font-semibold text-gray-800">
                   Sentiment Trends by Category
                 </h2>
-                <div className="flex flex-col md:flex-row items-center gap-2">
+                <div className="flex items-center gap-2">
                   <button
                     className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-lg hover:scale-105 transition-transform"
                     onClick={handleSubmit(() => {
@@ -1307,10 +1355,10 @@ export const Feedback = () => {
               <CardContent className="h-[400px] flex justify-center items-center">
                 {chartLoading ? (
                   <ChartSkeleton />
-                ) : sentimentPieData.length === 0 ||
-                  sentimentPieData[0].value === 0 ? (
+                ) : filteredSentimentData.length === 0 ||
+                  filteredSentimentData[0].value === 0 ? (
                   <p className="text-gray-500 text-lg">
-                    No sentiment data available.
+                    No sentiment trend data available.
                   </p>
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
