@@ -41,8 +41,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import GoogleMapComponent from "../components/google-map";
-import { obdCodes } from "@/constants/other";
-
+import { obdCodes, statusColors } from "@/constants/other";
+import { format } from "date-fns";
 // import Map, { Marker } from "react-map-gl";
 // import "mapbox-gl/dist/mapbox-gl.css";
 
@@ -274,59 +274,59 @@ export default function ClaimDetails() {
             Claim ID: <span className="font-bold">{claim.data._id}</span>
           </p>
           <span
-            className={`px-3 py-1 text-sm font-medium rounded-md ${
-              claim.data.status === "Approved"
-                ? "bg-green-600 text-white"
-                : claim.data.status === "Pending"
-                ? "bg-yellow-500 text-white"
-                : "bg-red-600 text-white"
-            }`}
+            className="px-3 py-1 text-sm font-medium rounded-md"
+            style={{
+              backgroundColor: statusColors[claim.data.status || "default"].bg,
+              color: statusColors[claim.data.status || "default"].text,
+            }}
           >
             {claim.data.status}
           </span>
         </div>
 
         {/* Insurance Details */}
-        <div className="p-4 bg-gray-50 rounded-md mt-4">
-          <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-700">
-            <ShieldCheck className="text-blue-500" size={18} /> Insurance
-            Details
-          </h3>
-          <div className="grid grid-cols-2 gap-3 mt-2 text-sm text-gray-800">
-            <p>
-              Insurance ID:{" "}
-              <span className="font-medium">{claim.data.insuranceId}</span>
-            </p>
-            <p>
-              NIC No: <span className="font-medium">{claim.data.nicNo}</span>
-            </p>
-            <p>
-              License No:{" "}
-              <span className="font-medium">{claim.data.drivingLicenseNo}</span>
-            </p>
+        <div className="p-4 bg-gray-50 rounded-md mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-700">
+              <ShieldCheck className="text-blue-500" size={18} /> Insurance
+              Details
+            </h3>
+            <div className="grid grid-cols-1 gap-3 mt-2 text-sm text-gray-800">
+              <p>
+                Insurance ID:{" "}
+                <span className="font-medium">{claim.data.insuranceId}</span>
+              </p>
+              <p>
+                NIC No: <span className="font-medium">{claim.data.nicNo}</span>
+              </p>
+              <p>
+                License No:{" "}
+                <span className="font-medium">
+                  {claim.data.drivingLicenseNo}
+                </span>
+              </p>
+            </div>
           </div>
-        </div>
 
-        {/* Damage Details */}
-        <div className="p-4 bg-gray-50 rounded-md mt-4">
-          <h3 className="text-lg font-semibold flex items-center gap-2 text-red-600">
-            <AlertTriangle size={18} /> Damage Details
-          </h3>
-          <p className="mt-1 text-sm text-gray-700">
-            <span className="font-medium">Damaged Areas:</span>{" "}
-            {claim.data.damagedAreas.join(", ")}
-          </p>
-        </div>
+          <div>
+            <h3 className="text-lg font-semibold flex items-center gap-2 text-red-600">
+              <AlertTriangle size={18} /> Damage Details
+            </h3>
+            <p className="mt-1 text-sm text-gray-700">
+              <span className="font-medium">Damaged Areas:</span>{" "}
+              {claim.data.damagedAreas.join(", ")}
+            </p>
 
-        {/* Audio Recording */}
-        <div className="p-4 bg-gray-50 rounded-md mt-4">
-          <h3 className="text-lg font-semibold flex items-center gap-2 text-purple-600">
-            <Mic size={18} /> Voice Record
-          </h3>
-          <audio controls className="w-full mt-2">
-            <source src={claim.data.audio} type="audio/mpeg" />
-            Your browser does not support the audio element.
-          </audio>
+            <div>
+              <h3 className="text-lg font-semibold flex items-center gap-2 text-purple-600 mt-5">
+                <Mic size={18} /> Voice Record
+              </h3>
+              <audio controls className="w-96 mt-2">
+                <source src={claim.data.audio} type="audio/mpeg" />
+                Your browser does not support the audio element.
+              </audio>
+            </div>
+          </div>
         </div>
 
         {/* Uploaded Images */}
@@ -806,7 +806,12 @@ export default function ClaimDetails() {
             <>
               <p className="text-gray-600 mb-5">
                 <span className="font-medium capitalize">Updated Time</span>:{" "}
-                {fraud?.data?.obdData?.updateTime}
+                {fraud?.data?.obdData?.updateTime
+                  ? format(
+                      new Date(fraud?.data?.obdData?.updateTime),
+                      "MMM d, yyyy h:mm a"
+                    )
+                  : "N/A"}
               </p>
 
               {obdObjectList.length > 0 ? (
@@ -821,7 +826,7 @@ export default function ClaimDetails() {
                           Code:{" "}
                           <span className="text-blue-600">{obd.code}</span>
                         </span>
-                        <span className="text-sm text-gray-500">{`#${
+                        <span className="text-sm text-gray-500">{`*#${
                           index + 1
                         }`}</span>
                       </h4>

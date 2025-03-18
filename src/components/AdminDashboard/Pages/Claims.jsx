@@ -12,6 +12,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
+import { statusColors } from "@/constants/other";
+import { format } from "date-fns";
+
 const columns = [
   {
     accessorKey: "_id",
@@ -46,16 +49,34 @@ const columns = [
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => (
-      <div className="font-medium text-black">{row.getValue("status")}</div>
-    ),
+    cell: ({ row }) => {
+      const status = row.getValue("status") || "default";
+      const { text, bg } = statusColors[status] || statusColors.default;
+
+      return (
+        <div
+          className="px-3 py-1 text-xs font-bold rounded-full"
+          style={{
+            backgroundColor: bg,
+            color: text,
+          }}
+        >
+          {status}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "createdAt",
     header: "Created At",
-    cell: ({ row }) => (
-      <div className="font-medium text-black">{row.getValue("createdAt")}</div>
-    ),
+    cell: ({ row }) => {
+      const dateValue = row.getValue("createdAt");
+      const formattedDate = dateValue
+        ? format(new Date(dateValue), "MMM d, yyyy h:mm a")
+        : "N/A";
+
+      return <div className="font-medium text-black">{formattedDate}</div>;
+    },
   },
   {
     id: "actions",
@@ -114,13 +135,7 @@ export default function Claims() {
   return (
     <div className="flex flex-col justify-center w-full gap-8">
       <div className="flex items-center justify-between w-full ">
-        <h1 className="text-4xl font-semibold ">Clients List</h1>
-        <Link
-          to="/admin/clients/add"
-          className="px-2 py-2 text-sm text-white transition-all duration-75 transform bg-black hover:bg-stone-950 sm:rounded-md"
-        >
-          Add Client
-        </Link>
+        <h1 className="text-4xl font-semibold ">Claims List</h1>
       </div>
       <SharedDataTable
         data={claimData?.data || []}
