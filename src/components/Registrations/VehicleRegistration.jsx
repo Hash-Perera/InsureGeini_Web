@@ -42,6 +42,8 @@ import {
   workRelatedCommercialUseAddons,
 } from "../../constants/policyData.js";
 
+import { vehicleColours } from "@/constants/other.js";
+
 import { vehicleRegistrationSchema } from "@/constants/validationSchema.js";
 
 const VehicleRegistration = ({
@@ -168,9 +170,9 @@ const VehicleRegistration = ({
   };
 
   return (
-    <div className="w-full ">
-      <div className="flex items-center justify-between mb-4 ">
-        <div className="flex flex-col ">
+    <div className="w-full">
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex flex-col">
           <h1 className="text-2xl font-semibold">Add Vehicle</h1>
           <p className="text-sm text-gray-500">
             Please fill in the details to add a new Vehicle
@@ -187,7 +189,7 @@ const VehicleRegistration = ({
       </div>
       <Form {...vehicleRegistrationForm}>
         <form
-          className="p-3 space-y-4 rounded-lg bg-gray-50"
+          className="p-3 space-y-4 bg-gray-50 rounded-lg"
           onSubmit={vehicleRegistrationForm.handleSubmit(onSubmit)}
         >
           {/* Insurance Policy Select */}
@@ -241,7 +243,7 @@ const VehicleRegistration = ({
                 Insurance Policy Add Ons
               </AccordionTrigger>
               <AccordionContent>
-                <div className="flex flex-col gap-2 ">
+                <div className="flex flex-col gap-2">
                   <div className="flex flex-col gap-2">
                     <Label>General Protection Add Ons</Label>
                     <div className="grid grid-cols-2 gap-2">
@@ -252,7 +254,7 @@ const VehicleRegistration = ({
                           name="policyAdOns.generaProtection"
                           render={({ field }) => {
                             return (
-                              <FormItem className="flex items-center gap-2 mt-1">
+                              <FormItem className="flex gap-2 items-center mt-1">
                                 <FormControl>
                                   <Checkbox
                                     checked={field.value?.includes(addon.value)}
@@ -290,7 +292,7 @@ const VehicleRegistration = ({
                           name="policyAdOns.vehicleSpecific"
                           render={({ field }) => {
                             return (
-                              <FormItem className="flex items-center gap-2 mt-1">
+                              <FormItem className="flex gap-2 items-center mt-1">
                                 <FormControl>
                                   <Checkbox
                                     checked={field.value?.includes(addon.value)}
@@ -328,7 +330,7 @@ const VehicleRegistration = ({
                           name="policyAdOns.usageSpecific"
                           render={({ field }) => {
                             return (
-                              <FormItem className="flex items-center gap-2 mt-1">
+                              <FormItem className="flex gap-2 items-center mt-1">
                                 <FormControl>
                                   <Checkbox
                                     checked={field.value?.includes(addon.value)}
@@ -367,7 +369,7 @@ const VehicleRegistration = ({
                           name="policyAdOns.workRelated"
                           render={({ field }) => {
                             return (
-                              <FormItem className="flex items-center gap-2 mt-1">
+                              <FormItem className="flex gap-2 items-center mt-1">
                                 <FormControl>
                                   <Checkbox
                                     checked={field.value?.includes(addon.value)}
@@ -470,7 +472,32 @@ const VehicleRegistration = ({
                 <FormItem>
                   <Label htmlFor="vehicleColor">vehicle Colour</Label>
                   <FormControl>
-                    <Input id="vehicleColor" {...field} className="max-w-md" />
+                    <Select
+                      id="vehicleColor"
+                      value={field.value} // ✅ Ensure the selected value is managed by React Hook Form
+                      onValueChange={field.onChange} // ✅ Handle changes properly
+                      className="w-full max-w-md"
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a vehicle colour">
+                          {field.value || "Select a vehicle colour"}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Select a vehicle colour</SelectLabel>
+                          {vehicleColours?.map((color) => (
+                            <SelectItem key={color.value} value={color.value}>
+                              <div className="flex flex-col gap-1">
+                                <p className="text-sm font-medium">
+                                  {color.value}
+                                </p>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

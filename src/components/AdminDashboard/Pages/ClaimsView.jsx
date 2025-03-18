@@ -45,6 +45,7 @@ import { obdCodes, statusColors } from "@/constants/other";
 import { format } from "date-fns";
 // import Map, { Marker } from "react-map-gl";
 // import "mapbox-gl/dist/mapbox-gl.css";
+import { staffTypes } from "@/constants/other.js";
 
 export default function ClaimDetails() {
   const { id } = useParams();
@@ -101,49 +102,44 @@ export default function ClaimDetails() {
     );
 
   // // Submit form data
-  // const fraudApproveForm = useForm({
-  //   resolver: zodResolver(fraudApproveSchema),
-  //   defaultValues: {
-  //     claimId: id,
-  //     status: "",
-  //   },
-  // });
+  const fraudApproveForm = useForm({
+    resolver: zodResolver(fraudApproveSchema),
+    defaultValues: {
+      claimId: id,
+      status: "",
+    },
+  });
 
-  // const mutation = useMutation({
-  //   mutationFn: async (data) => {
-  //     try {
-  //       setSubmitLoading(true); // Prevent multiple submissions
-  //       const response = await fraudApprove(data);
-  //       toast.success("Submitted successfully");
-  //       queryClient.invalidateQueries({ queryKey: ["staff"] });
-  //       fraudApproveForm.reset();
-  //       return response;
-  //     } catch (error) {
-  //       toast.error("Error occurred");
-  //     } finally {
-  //       setSubmitLoading(false);
-  //     }
-  //   },
-  // });
+  const mutation = useMutation({
+    mutationFn: async (data) => {
+      try {
+        setSubmitLoading(true); // Prevent multiple submissions
+        const response = await fraudApprove(data);
+        toast.success("Submitted successfully");
+        queryClient.invalidateQueries({ queryKey: ["staff"] });
+        fraudApproveForm.reset();
+        return response;
+      } catch (error) {
+        toast.error("Error occurred");
+      } finally {
+        setSubmitLoading(false);
+      }
+    },
+  });
 
-  // const onSubmit = (data) => {
-  //   setSubmitLoading(true);
-  //   mutation.mutate(data);
-  // };
-
-  // const staffTypes = [
-  //   { value: "Approve", label: "Approve" },
-  //   { value: "Reject", label: "Reject" },
-  // ];
+  const onSubmit = (data) => {
+    setSubmitLoading(true);
+    mutation.mutate(data);
+  };
 
   //! Render Details Component
   const RenderDetails = ({ title, details }) => {
     return (
       <div className="p-4 bg-gray-50 rounded-lg shadow-md">
-        <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-700">
+        <h3 className="flex gap-2 items-center text-lg font-semibold text-gray-700">
           <BadgeCheck className="text-green-500" size={18} /> {title}
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2 text-sm text-gray-800">
+        <div className="grid grid-cols-1 gap-3 mt-2 text-sm text-gray-800 md:grid-cols-2">
           {Object.entries(details).map(([key, value], index) => (
             <p key={index}>
               <span className="font-medium capitalize">
@@ -159,12 +155,12 @@ export default function ClaimDetails() {
 
   return (
     <>
-      {/* <div className="bg-white shadow-lg rounded-xl p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
+      {/* <div className="p-6 bg-white rounded-xl shadow-lg">
+        <h2 className="mb-4 text-2xl font-bold text-gray-800">
           Vehicle Details
         </h2>
 
-        <div className="p-4 bg-gray-100 rounded-lg mb-4">
+        <div className="p-4 mb-4 bg-gray-100 rounded-lg">
           <p className="text-lg font-bold">
             Claim ID: {fraud?.data?.vehicle?._id}
           </p>
@@ -212,7 +208,7 @@ export default function ClaimDetails() {
           </div>
         </div>
 
-        <h3 className="text-xl font-bold text-gray-800 mt-6">Insurance Card</h3>
+        <h3 className="mt-6 text-xl font-bold text-gray-800">Insurance Card</h3>
         <div className="flex gap-2 mt-2">
           <img
             src={fraud?.data?.vehicle?.insuranceCard?.front}
@@ -226,7 +222,7 @@ export default function ClaimDetails() {
           />
         </div>
 
-        <h3 className="text-xl font-bold text-gray-800 mt-6">Vehicle Photos</h3>
+        <h3 className="mt-6 text-xl font-bold text-gray-800">Vehicle Photos</h3>
         <div className="flex flex-wrap gap-2 mt-2">
           {Object.entries(fraud?.data?.vehicle?.vehiclePhotos || {}).map(
             ([key, url]) => (
@@ -242,7 +238,7 @@ export default function ClaimDetails() {
           )}
         </div>
 
-        <h3 className="text-xl font-bold text-gray-800 mt-6">
+        <h3 className="mt-6 text-xl font-bold text-gray-800">
           Number Plate Images
         </h3>
         <div className="flex gap-2 mt-2">
@@ -259,17 +255,17 @@ export default function ClaimDetails() {
         </div>
       </div> */}
 
-      <div className="p-6 bg-white shadow-md rounded-lg mb-6">
+      <div className="p-6 mb-6 bg-white rounded-lg shadow-md">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-900 to-blue-600 text-white py-3 px-5 rounded-md shadow-md flex items-center gap-2">
+        <div className="flex gap-2 items-center px-5 py-3 text-white bg-gradient-to-r from-blue-900 to-blue-600 rounded-md shadow-md">
           <FileText size={24} />
-          <h2 className="text-2xl font-bold uppercase tracking-wide">
+          <h2 className="text-2xl font-bold tracking-wide uppercase">
             Claim Details
           </h2>
         </div>
 
         {/* Claim Info */}
-        <div className="p-4 bg-gray-100 rounded-md mt-4 flex justify-between items-center">
+        <div className="flex justify-between items-center p-4 mt-4 bg-gray-100 rounded-md">
           <p className="text-sm font-medium">
             Claim ID: <span className="font-bold">{claim.data._id}</span>
           </p>
@@ -285,9 +281,9 @@ export default function ClaimDetails() {
         </div>
 
         {/* Insurance Details */}
-        <div className="p-4 bg-gray-50 rounded-md mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 p-4 mt-4 bg-gray-50 rounded-md md:grid-cols-2">
           <div>
-            <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-700">
+            <h3 className="flex gap-2 items-center text-lg font-semibold text-gray-700">
               <ShieldCheck className="text-blue-500" size={18} /> Insurance
               Details
             </h3>
@@ -309,7 +305,7 @@ export default function ClaimDetails() {
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold flex items-center gap-2 text-red-600">
+            <h3 className="flex gap-2 items-center text-lg font-semibold text-red-600">
               <AlertTriangle size={18} /> Damage Details
             </h3>
             <p className="mt-1 text-sm text-gray-700">
@@ -318,10 +314,10 @@ export default function ClaimDetails() {
             </p>
 
             <div>
-              <h3 className="text-lg font-semibold flex items-center gap-2 text-purple-600 mt-5">
+              <h3 className="flex gap-2 items-center mt-5 text-lg font-semibold text-purple-600">
                 <Mic size={18} /> Voice Record
               </h3>
-              <audio controls className="w-96 mt-2">
+              <audio controls className="mt-2 w-96">
                 <source src={claim.data.audio} type="audio/mpeg" />
                 Your browser does not support the audio element.
               </audio>
@@ -330,83 +326,83 @@ export default function ClaimDetails() {
         </div>
 
         {/* Uploaded Images */}
-        <div className="p-4 bg-gray-50 rounded-md mt-4">
-          <h3 className="text-lg font-semibold flex items-center gap-2 text-blue-600">
+        <div className="p-4 mt-4 bg-gray-50 rounded-md">
+          <h3 className="flex gap-2 items-center text-lg font-semibold text-blue-600">
             <Image size={18} /> Uploaded Images
           </h3>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-3">
+          <div className="grid grid-cols-2 gap-3 mt-3 md:grid-cols-3">
             {/* Insurance Images */}
-            <div className="bg-white p-3 rounded-md shadow-sm">
+            <div className="p-3 bg-white rounded-md shadow-sm">
               <h4 className="text-sm font-semibold text-gray-600">
                 Insurance Documents
               </h4>
               <div className="flex gap-2 mt-2">
                 <img
                   src={claim.data.insuranceFront}
-                  className="w-28 h-28 rounded-md shadow-md hover:scale-105 transition-transform"
+                  className="w-28 h-28 rounded-md shadow-md transition-transform hover:scale-105"
                   alt="Insurance Front"
                 />
                 <img
                   src={claim.data.insuranceBack}
-                  className="w-28 h-28 rounded-md shadow-md hover:scale-105 transition-transform"
+                  className="w-28 h-28 rounded-md shadow-md transition-transform hover:scale-105"
                   alt="Insurance Back"
                 />
               </div>
             </div>
 
             {/* NIC Images */}
-            <div className="bg-white p-3 rounded-md shadow-sm">
+            <div className="p-3 bg-white rounded-md shadow-sm">
               <h4 className="text-sm font-semibold text-gray-600">
                 NIC Documents
               </h4>
               <div className="flex gap-2 mt-2">
                 <img
                   src={claim.data.nicFront}
-                  className="w-28 h-28 rounded-md shadow-md hover:scale-105 transition-transform"
+                  className="w-28 h-28 rounded-md shadow-md transition-transform hover:scale-105"
                   alt="NIC Front"
                 />
                 <img
                   src={claim.data.nicBack}
-                  className="w-28 h-28 rounded-md shadow-md hover:scale-105 transition-transform"
+                  className="w-28 h-28 rounded-md shadow-md transition-transform hover:scale-105"
                   alt="NIC Back"
                 />
               </div>
             </div>
 
             {/* License Images */}
-            <div className="bg-white p-3 rounded-md shadow-sm">
+            <div className="p-3 bg-white rounded-md shadow-sm">
               <h4 className="text-sm font-semibold text-gray-600">
                 License Documents
               </h4>
               <div className="flex gap-2 mt-2">
                 <img
                   src={claim.data.drivingLicenseFront}
-                  className="w-28 h-28 rounded-md shadow-md hover:scale-105 transition-transform"
+                  className="w-28 h-28 rounded-md shadow-md transition-transform hover:scale-105"
                   alt="License Front"
                 />
                 <img
                   src={claim.data.drivingLicenseBack}
-                  className="w-28 h-28 rounded-md shadow-md hover:scale-105 transition-transform"
+                  className="w-28 h-28 rounded-md shadow-md transition-transform hover:scale-105"
                   alt="License Back"
                 />
               </div>
             </div>
 
             {/* License Plates */}
-            <div className="bg-white p-3 rounded-md shadow-sm">
+            <div className="p-3 bg-white rounded-md shadow-sm">
               <h4 className="text-sm font-semibold text-gray-600">
                 License Plates
               </h4>
               <div className="flex gap-2 mt-2">
                 <img
                   src={claim.data.frontLicencePlate}
-                  className="w-28 h-28 rounded-md shadow-md hover:scale-105 transition-transform"
+                  className="w-28 h-28 rounded-md shadow-md transition-transform hover:scale-105"
                   alt="Front License Plate"
                 />
                 <img
                   src={claim.data.backLicencePlate}
-                  className="w-28 h-28 rounded-md shadow-md hover:scale-105 transition-transform"
+                  className="w-28 h-28 rounded-md shadow-md transition-transform hover:scale-105"
                   alt="Back License Plate"
                 />
               </div>
@@ -417,12 +413,12 @@ export default function ClaimDetails() {
           <h4 className="mt-4 text-sm font-semibold text-red-600">
             Damage Images
           </h4>
-          <div className="flex gap-2 mt-2 overflow-x-auto p-2">
+          <div className="flex overflow-x-auto gap-2 p-2 mt-2">
             {claim.data.damageImages.map((img, index) => (
               <img
                 key={index}
                 src={img}
-                className="w-28 h-28 rounded-md shadow-md hover:scale-105 transition-transform"
+                className="w-28 h-28 rounded-md shadow-md transition-transform hover:scale-105"
                 alt={`Damage ${index + 1}`}
               />
             ))}
@@ -431,23 +427,23 @@ export default function ClaimDetails() {
       </div>
 
       {/* Fraud Detection Results */}
-      <div className="bg-white  rounded-xl p-6">
-        <div className="bg-gradient-to-r from-blue-900 to-blue-600 text-white py-3 px-5 rounded-md shadow-md flex items-center gap-2 mb-5">
+      <div className="p-6 bg-white rounded-xl">
+        <div className="flex gap-2 items-center px-5 py-3 mb-5 text-white bg-gradient-to-r from-blue-900 to-blue-600 rounded-md shadow-md">
           <FileText size={24} />
-          <h2 className="text-2xl font-bold uppercase tracking-wide">
+          <h2 className="text-2xl font-bold tracking-wide uppercase">
             Fraud Detection Results
           </h2>
         </div>
         {/* Vehicle Details ================================================================================================================================= */}
-        <div className="p-6 bg-white shadow-lg rounded-xl mb-6">
+        <div className="p-6 mb-6 bg-white rounded-xl shadow-lg">
           {/* Section Header with Icon */}
-          <h3 className="text-2xl font-semibold text-gray-800 flex items-center gap-2">
+          <h3 className="flex gap-2 items-center text-2xl font-semibold text-gray-800">
             <Car className="text-blue-600" size={24} />
             Vehicle Details
           </h3>
 
           <div className="mt-4 space-y-3">
-            <div className="flex items-center gap-3">
+            <div className="flex gap-3 items-center">
               <Car className="text-indigo-500" size={20} />
               <p className="text-lg text-gray-700">
                 <span className="font-semibold text-gray-900">Model:</span>
@@ -457,7 +453,7 @@ export default function ClaimDetails() {
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex gap-3 items-center">
               <Palette className="text-green-500" size={20} />
               <p className="text-lg text-gray-700">
                 <span className="font-semibold text-gray-900">Color:</span>
@@ -467,7 +463,7 @@ export default function ClaimDetails() {
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex gap-3 items-center">
               <Hash className="text-red-500" size={20} />
               <p className="text-lg text-gray-700">
                 <span className="font-semibold text-gray-900">
@@ -487,9 +483,9 @@ export default function ClaimDetails() {
           {!fraud?.data?.fraud?.model_result?.model ||
           !fraud?.data?.fraud?.color?.color ||
           !fraud?.data?.fraud?.number_plates?.number_plate ? (
-            <div className="mt-4 flex items-center text-red-600">
+            <div className="flex items-center mt-4 text-red-600">
               <AlertCircle size={20} />
-              <p className="text-md ml-2">
+              <p className="ml-2 text-md">
                 Some vehicle details could not be detected. Please verify
                 manually.
               </p>
@@ -497,18 +493,18 @@ export default function ClaimDetails() {
           ) : null}
         </div>
         {/* Face Recognition =============================================================================================================================================*/}
-        <div className="p-6 bg-white shadow-lg rounded-xl mb-6">
+        <div className="p-6 mb-6 bg-white rounded-xl shadow-lg">
           {/* Section Header with Icon */}
-          <h3 className="text-2xl font-semibold text-gray-800 flex items-center gap-2">
+          <h3 className="flex gap-2 items-center text-2xl font-semibold text-gray-800">
             <AlertTriangle className="text-yellow-500" />
             Face Recognition
           </h3>
 
-          <div className="flex items-center gap-2 mt-3">
+          <div className="flex gap-2 items-center mt-3">
             {fraud?.data?.fraud?.face_result?.verified ? (
-              <CheckCircle className="text-green-500 text-xl" />
+              <CheckCircle className="text-xl text-green-500" />
             ) : (
-              <XCircle className="text-red-500 text-xl" />
+              <XCircle className="text-xl text-red-500" />
             )}
             <p
               className={`text-lg font-medium ${
@@ -528,18 +524,18 @@ export default function ClaimDetails() {
               <h4 className="text-xl font-semibold text-gray-700">
                 Model Result
               </h4>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-3">
+              <div className="grid grid-cols-2 gap-4 mt-3 md:grid-cols-3">
                 {fraud?.data?.fraud?.face_result?.model_results?.map(
                   (model, index) => (
                     <div
                       key={index}
-                      className="bg-gray-100 p-4 rounded-lg shadow-md"
+                      className="p-4 bg-gray-100 rounded-lg shadow-md"
                     >
                       <p className="text-lg font-semibold text-gray-700">
                         Model:{" "}
                         <span className="text-indigo-600">{model.Model}</span>
                       </p>
-                      <p className="text-md text-gray-500 flex items-center gap-2">
+                      <p className="flex gap-2 items-center text-gray-500 text-md">
                         <Camera className="text-blue-500" size={16} />
                         Result:{" "}
                         <span
@@ -555,18 +551,18 @@ export default function ClaimDetails() {
                 )}
               </div>
 
-              <h4 className="text-xl font-semibold text-gray-700 mt-6">
+              <h4 className="mt-6 text-xl font-semibold text-gray-700">
                 Images
               </h4>
-              <div className="flex gap-4 mt-4 overflow-x-auto p-2">
+              <div className="flex overflow-x-auto gap-4 p-2 mt-4">
                 {fraud?.data?.fraud?.face_result?.images?.license && (
                   <div className="relative">
                     <img
                       src={fraud?.data?.fraud?.face_result?.images?.license}
-                      className="w-54 h-36 rounded-lg shadow-lg border-2 border-gray-300"
+                      className="h-36 rounded-lg border-2 border-gray-300 shadow-lg w-54"
                       alt="License"
                     />
-                    <p className="absolute bottom-2 left-2 bg-gray-800 text-white text-xs px-2 py-1 rounded">
+                    <p className="absolute bottom-2 left-2 px-2 py-1 text-xs text-white bg-gray-800 rounded">
                       License
                     </p>
                   </div>
@@ -575,10 +571,10 @@ export default function ClaimDetails() {
                   <div className="relative">
                     <img
                       src={fraud?.data?.fraud?.face_result?.images?.driver}
-                      className="w-36 h-36 rounded-lg shadow-lg border-2 border-gray-300"
+                      className="w-36 h-36 rounded-lg border-2 border-gray-300 shadow-lg"
                       alt="Driver"
                     />
-                    <p className="absolute bottom-2 left-2 bg-gray-800 text-white text-xs px-2 py-1 rounded">
+                    <p className="absolute bottom-2 left-2 px-2 py-1 text-xs text-white bg-gray-800 rounded">
                       Driver
                     </p>
                   </div>
@@ -589,10 +585,10 @@ export default function ClaimDetails() {
                       src={
                         fraud?.data?.fraud?.face_result?.images?.cropped_face
                       }
-                      className="w-36 h-36 rounded-lg shadow-lg border-2 border-gray-300"
+                      className="w-36 h-36 rounded-lg border-2 border-gray-300 shadow-lg"
                       alt="Cropped Face"
                     />
-                    <p className="absolute bottom-2 left-2 bg-gray-800 text-white text-xs px-2 py-1 rounded">
+                    <p className="absolute bottom-2 left-2 px-2 py-1 text-xs text-white bg-gray-800 rounded">
                       Licence Face
                     </p>
                   </div>
@@ -600,7 +596,7 @@ export default function ClaimDetails() {
               </div>
             </div>
           ) : (
-            <div className="mt-5 flex items-center gap-2 text-red-600">
+            <div className="flex gap-2 items-center mt-5 text-red-600">
               <XCircle className="text-2xl" />
               <p className="text-lg font-medium">
                 Error Occurred in Face Recognition
@@ -609,40 +605,40 @@ export default function ClaimDetails() {
           )}
         </div>
         {/* Similarity Detection ================================================================================================================================ */}
-        <div className="p-6 bg-white shadow-lg rounded-xl mb-6">
-          <h3 className="text-2xl font-semibold text-gray-800 flex items-center gap-2">
+        <div className="p-6 mb-6 bg-white rounded-xl shadow-lg">
+          <h3 className="flex gap-2 items-center text-2xl font-semibold text-gray-800">
             <Car className="text-blue-600" size={24} />
             Previous Damages Similarities
           </h3>
 
           {/* Similarity List */}
           {fraud?.data?.fraud?.similarity_score?.status ? (
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 mt-4 md:grid-cols-2">
               {fraud?.data?.fraud?.similarity_score?.results?.map(
                 (item, index) => (
                   <div
                     key={index}
-                    className="bg-gray-50 p-4 rounded-lg shadow-md"
+                    className="p-4 bg-gray-50 rounded-lg shadow-md"
                   >
                     {/* Image Comparison */}
                     <div className="grid grid-cols-2 gap-3">
                       <div className="relative">
                         <img
                           src={item.image_url_1}
-                          className="w-full h-40 object-cover rounded-lg shadow"
+                          className="object-cover w-full h-40 rounded-lg shadow"
                           alt={`Damage ${index + 1}`}
                         />
-                        <p className="absolute bottom-2 left-2 bg-gray-800 text-white text-xs px-2 py-1 rounded">
+                        <p className="absolute bottom-2 left-2 px-2 py-1 text-xs text-white bg-gray-800 rounded">
                           Current Claim
                         </p>
                       </div>
                       <div className="relative">
                         <img
                           src={item.image_url_2}
-                          className="w-full h-40 object-cover rounded-lg shadow"
+                          className="object-cover w-full h-40 rounded-lg shadow"
                           alt={`Previous Damage ${index + 1}`}
                         />
-                        <p className="absolute bottom-2 left-2 bg-gray-800 text-white text-xs px-2 py-1 rounded">
+                        <p className="absolute bottom-2 left-2 px-2 py-1 text-xs text-white bg-gray-800 rounded">
                           Previous Damage
                         </p>
                       </div>
@@ -656,7 +652,7 @@ export default function ClaimDetails() {
                           {(item.similarity_score * 100).toFixed(1)}%
                         </span>
                       </p>
-                      <div className="w-full bg-gray-300 h-2 rounded-full mt-1">
+                      <div className="mt-1 w-full h-2 bg-gray-300 rounded-full">
                         <div
                           className={`h-full rounded-full ${
                             item.similarity_score > 0.75
@@ -669,8 +665,8 @@ export default function ClaimDetails() {
                     </div>
 
                     {/* Similarity Message */}
-                    <div className="mt-2 flex items-center text-gray-700 text-sm">
-                      <AlertTriangle className="text-red-500 mr-2" size={16} />
+                    <div className="flex items-center mt-2 text-sm text-gray-700">
+                      <AlertTriangle className="mr-2 text-red-500" size={16} />
                       <p>{item.message}</p>
                     </div>
                   </div>
@@ -678,16 +674,16 @@ export default function ClaimDetails() {
               )}
             </div>
           ) : (
-            <div className="mt-4 flex items-center gap-2 text-red-600">
+            <div className="flex gap-2 items-center mt-4 text-red-600">
               <AlertCircle size={20} />
               <p className="text-md">Error Occurred in Similarity Detection</p>
             </div>
           )}
         </div>
         {/* Insurance Card Details ================================================================================================================================ */}
-        <div className="p-6 bg-white shadow-lg rounded-xl mb-6">
+        <div className="p-6 mb-6 bg-white rounded-xl shadow-lg">
           {/* Insurance Details */}
-          <h3 className="text-2xl font-semibold text-gray-800 flex items-center gap-2">
+          <h3 className="flex gap-2 items-center text-2xl font-semibold text-gray-800">
             <FileText className="text-blue-600" size={24} />
             Insurance & License Details
           </h3>
@@ -726,20 +722,20 @@ export default function ClaimDetails() {
             )}
           </div>
         </div>
-        <div className="p-6 bg-white shadow-lg rounded-xl mb-6">
+        <div className="p-6 mb-6 bg-white rounded-xl shadow-lg">
           {/* Insurance Details */}
-          <h3 className="text-2xl font-semibold text-gray-800 flex items-center gap-2">
+          <h3 className="flex gap-2 items-center text-2xl font-semibold text-gray-800">
             <MapPin className="text-blue-600" size={24} />
             Location Details
           </h3>
 
           <div className="mt-4 space-y-4">
-            <div className="max-w-6xl mx-auto p-6">
+            <div className="p-6 mx-auto max-w-6xl">
               {/* Two Maps in One Row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {/* Claim Photos Location Map */}
-                <div className="bg-white shadow-lg rounded-lg p-4">
-                  <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                <div className="p-4 bg-white rounded-lg shadow-lg">
+                  <h3 className="mb-2 text-lg font-semibold text-gray-700">
                     Image Location
                   </h3>
                   {imageLocation?.latitude ? (
@@ -748,7 +744,7 @@ export default function ClaimDetails() {
                       longitude={imageLocation.longitude}
                     />
                   ) : (
-                    <div className="text-red-600 flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 text-red-600">
                       <AlertCircle size={20} />
                       <p>Location Details could not be found.</p>
                     </div>
@@ -756,8 +752,8 @@ export default function ClaimDetails() {
                 </div>
 
                 {/* Actual Location Map */}
-                <div className="bg-white shadow-lg rounded-lg p-4">
-                  <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                <div className="p-4 bg-white rounded-lg shadow-lg">
+                  <h3 className="mb-2 text-lg font-semibold text-gray-700">
                     Reported Location
                   </h3>
                   {actualLocation?.latitude ? (
@@ -766,7 +762,7 @@ export default function ClaimDetails() {
                       longitude={actualLocation.longitude}
                     />
                   ) : (
-                    <div className="text-red-600 flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 text-red-600">
                       <AlertCircle size={20} />
                       <p>Location Details could not be found.</p>
                     </div>
@@ -777,12 +773,12 @@ export default function ClaimDetails() {
               {/* Comparison Result */}
               <div className="mt-6 text-center">
                 {isLocationMatching ? (
-                  <div className="bg-green-100 text-green-700 font-medium py-3 px-6 rounded-lg flex items-center justify-center space-x-2">
+                  <div className="flex justify-center items-center px-6 py-3 space-x-2 font-medium text-green-700 bg-green-100 rounded-lg">
                     <CheckCircle size={24} />
                     <p>✅ The claim location and image location match.</p>
                   </div>
                 ) : (
-                  <div className="bg-red-100 text-red-700 font-medium py-3 px-6 rounded-lg flex items-center justify-center space-x-2">
+                  <div className="flex justify-center items-center px-6 py-3 space-x-2 font-medium text-red-700 bg-red-100 rounded-lg">
                     <AlertCircle size={24} />
                     <p>
                       ⚠️ The locations do not match! Further verification
@@ -795,16 +791,16 @@ export default function ClaimDetails() {
           </div>
         </div>
 
-        <div className="p-6 bg-white shadow-lg rounded-xl mb-6">
+        <div className="p-6 mb-6 bg-white rounded-xl shadow-lg">
           {/* Vehicle Condition Details */}
-          <h3 className="text-2xl font-semibold text-gray-800 flex items-center gap-2 mb-5">
+          <h3 className="flex gap-2 items-center mb-5 text-2xl font-semibold text-gray-800">
             <Activity className="text-blue-600" size={24} />
             Vehicle Prior Condition
           </h3>
 
           {fraud?.data?.obdData?.obdCodes ? (
             <>
-              <p className="text-gray-600 mb-5">
+              <p className="mb-5 text-gray-600">
                 <span className="font-medium capitalize">Updated Time</span>:{" "}
                 {fraud?.data?.obdData?.updateTime
                   ? format(
@@ -819,9 +815,9 @@ export default function ClaimDetails() {
                   {obdObjectList.map((obd, index) => (
                     <div
                       key={index}
-                      className="p-4 border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition duration-300"
+                      className="p-4 rounded-lg border border-gray-200 shadow-sm transition duration-300 hover:shadow-md"
                     >
-                      <h4 className="text-lg font-semibold text-gray-800 flex justify-between">
+                      <h4 className="flex justify-between text-lg font-semibold text-gray-800">
                         <span>
                           Code:{" "}
                           <span className="text-blue-600">{obd.code}</span>
@@ -830,33 +826,33 @@ export default function ClaimDetails() {
                           index + 1
                         }`}</span>
                       </h4>
-                      <p className="text-gray-600 mt-2">
+                      <p className="mt-2 text-gray-600">
                         <strong>Description:</strong> {obd.codeDescription}
                       </p>
-                      <p className="text-gray-700 mt-2">
+                      <p className="mt-2 text-gray-700">
                         <strong>Possible Impact:</strong> {obd.possibleResult}
                       </p>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center mt-4">
+                <p className="mt-4 text-center text-gray-500">
                   No OBD issues detected.
                 </p>
               )}
             </>
           ) : (
-            <p className="text-gray-500 text-center mt-4">
+            <p className="mt-4 text-center text-gray-500">
               No OBD issues detected.
             </p>
           )}
         </div>
       </div>
 
-      {/* <Form {...fraudApproveForm}>
+      <Form {...fraudApproveForm}>
         <form
-          className="w-full flex items-center gap-4"
-          onSubmit={fraudApproveForm.handleSubmit(mutation.mutate)}
+          className="flex gap-4 items-center w-full"
+          onSubmit={fraudApproveForm.handleSubmit(onSubmit)}
         >
           <div className="flex items-center gap-2 flex-1 min-w-[300px]">
             <Label htmlFor="Status" className="text-sm font-medium">
@@ -868,7 +864,13 @@ export default function ClaimDetails() {
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormControl>
-                    <Select {...field} id="Status" className="w-full">
+                    <Select
+                      {...field}
+                      id="status"
+                      className="w-full"
+                      value={field.value} // ✅ Ensure the selected value is managed by React Hook Form
+                      onValueChange={field.onChange} // ✅ Handle changes properly
+                    >
                       <SelectTrigger className="h-9">
                         <SelectValue>
                           {
@@ -901,7 +903,7 @@ export default function ClaimDetails() {
             {submitLoading ? "Submitting..." : "Submit"}
           </Button>
         </form>
-      </Form> */}
+      </Form>
     </>
   );
 }

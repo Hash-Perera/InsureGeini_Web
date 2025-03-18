@@ -233,3 +233,21 @@ export const statusColors = {
   Completed: { text: "#065f46", bg: "#d1fae5" }, // Dark green text, light green bg
   default: { text: "#374151", bg: "#f3f4f6" }, // Dark gray text, light gray bg
 };
+
+export const vehicleColours = [
+  { value: "Red", label: "Red" },
+  { value: "Blue", label: "Blue" },
+  { value: "Black", label: "Black" },
+  { value: "White", label: "White" },
+  { value: "Silver", label: "Silver" },
+  { value: "Grey", label: "Grey" },
+  { value: "Green", label: "Green" },
+  { value: "Yellow", label: "Yellow" },
+  { value: "Orange", label: "Orange" },
+  { value: "Brown", label: "Brown" },
+];
+
+export const staffTypes = [
+  { value: "Approve", label: "Approve" },
+  { value: "Reject", label: "Reject" },
+];
