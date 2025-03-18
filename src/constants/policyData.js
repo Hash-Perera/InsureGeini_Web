@@ -4,10 +4,6 @@ export const policies = [
     description: "Covers own vehicle & third-party",
   },
   {
-    title: "Third-Party Only (TPO) Insurance",
-    description: "Covers damage to others, legally required.",
-  },
-  {
     title: "Third-Party Fire & Theft (TPFT) Insurance",
     description:
       "Third party, fire and theft insurance covers your car against fire and theft.",

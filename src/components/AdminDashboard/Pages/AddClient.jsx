@@ -101,7 +101,7 @@ const AddClient = () => {
   };
 
   return (
-    <div className="max-w-4xl space-y-4 ">
+    <div className="space-y-4 max-w-4xl">
       {!isCustomerRegistered && !userId && !id && (
         <>
           <div>
@@ -112,7 +112,7 @@ const AddClient = () => {
           </div>
           <Form {...clientRegistrationForm}>
             <form
-              className="p-3 space-y-4 rounded-lg bg-gray-50 "
+              className="p-3 space-y-4 bg-gray-50 rounded-lg"
               onSubmit={clientRegistrationForm.handleSubmit(onSubmit)}
             >
               {/* policy type select */}
@@ -344,7 +344,7 @@ const AddClient = () => {
 
               {/* Password & Confirm Password */}
               <div className="grid grid-cols-4 gap-2">
-                <div className="col-span-3 ">
+                <div className="col-span-3">
                   <FormField
                     control={clientRegistrationForm.control}
                     name="password"
