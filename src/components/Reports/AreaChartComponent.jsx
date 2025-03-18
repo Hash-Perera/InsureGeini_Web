@@ -5,6 +5,7 @@ import {
   CartesianGrid,
   XAxis,
   ResponsiveContainer,
+  YAxis,
 } from "recharts";
 import {
   Card,
@@ -55,8 +56,8 @@ export function AreaChartComponent({ data }) {
   console.log(reverseData(data));
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between ">
-        <div className="flex flex-col gap-2 ">
+      <CardHeader className="flex flex-row justify-between items-center">
+        <div className="flex flex-col gap-2">
           <CardTitle>Estimated Vs Accepted</CardTitle>
           <CardDescription>
             A comparison of estimated vs accepted claims
@@ -68,9 +69,10 @@ export function AreaChartComponent({ data }) {
         <ResponsiveContainer width="100%" height="100%">
           <ChartContainer config={chartConfig}>
             <AreaChart
-              accessibilityLayer
+              //  type="monotone"
               data={reverseData(data) || chartData}
               margin={{
+                top: 20, // Added top margin
                 left: 12,
                 right: 12,
               }}
@@ -83,6 +85,10 @@ export function AreaChartComponent({ data }) {
                 tickMargin={8}
                 tickFormatter={(value) => value.slice(0, 10)}
               />
+              <YAxis
+                domain={["auto", "auto"]} // This will automatically adjust the Y-axis range
+              />
+
               <ChartTooltip
                 cursor={false}
                 content={<ChartTooltipContent indicator="line" />}
@@ -109,12 +115,12 @@ export function AreaChartComponent({ data }) {
         </ResponsiveContainer>
       </CardContent>
       <CardFooter>
-        <div className="flex items-start w-full gap-2 text-sm">
+        <div className="flex gap-2 items-start w-full text-sm">
           <div className="grid gap-2">
-            <div className="flex items-center gap-2 font-medium leading-none">
+            <div className="flex gap-2 items-center font-medium leading-none">
               Trending up by 5.2% this month <TrendingUp className="w-4 h-4" />
             </div>
-            <div className="flex items-center gap-2 leading-none text-muted-foreground">
+            <div className="flex gap-2 items-center leading-none text-muted-foreground">
               January - June 2024
             </div>
           </div>
