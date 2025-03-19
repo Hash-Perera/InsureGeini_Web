@@ -15,6 +15,14 @@ export const fetchAllReports = async () => {
   }
 };
 
+export const fetchReportsByClaimId = async (claimId) => {
+  try {
+    const response = await axiosInstance.get(`/reports/all/${claimId}`);
+    return response?.data?.data;
+  } catch (error) {
+    throw error;
+  }
+};
 export const fetchReportStats = async ({
   filters = { timeInterval: "7days" }, // Default value of 7days if not provided
 }) => {

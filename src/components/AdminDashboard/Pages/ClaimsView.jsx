@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getClaimById, fraudCompare, fraudApprove } from "@/services/claims";
@@ -46,6 +46,8 @@ import { format } from "date-fns";
 // import Map, { Marker } from "react-map-gl";
 // import "mapbox-gl/dist/mapbox-gl.css";
 import { staffTypes } from "@/constants/other.js";
+import DamageDetection from "@/components/ClaimView/DamageDetection";
+import ReportDetails from "@/components/ClaimView/ReportsData";
 
 export default function ClaimDetails() {
   const { id } = useParams();
@@ -426,6 +428,9 @@ export default function ClaimDetails() {
         </div>
       </div>
 
+      <DamageDetection />
+      <ReportDetails />
+
       {/* Fraud Detection Results */}
       <div className="p-6 bg-white rounded-xl">
         <div className="flex gap-2 items-center px-5 py-3 mb-5 text-white bg-gradient-to-r from-blue-900 to-blue-600 rounded-md shadow-md">
@@ -439,12 +444,12 @@ export default function ClaimDetails() {
           {/* Section Header with Icon */}
 
           {claim?.data?.fraud_verification ? (
-            <div className="p-4 bg-gray-50 mt-4 mb-5">
+            <div className="p-4 mt-4 mb-5 bg-gray-50">
               <h2 className="text-lg font-semibold text-gray-800">
                 Fraud Verification Results
               </h2>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-3 ">
+              <div className="grid grid-cols-2 gap-3 mt-3 md:grid-cols-3">
                 {Object.entries(claim?.data?.fraud_verification).map(
                   ([key, value], index) => (
                     <div key={index} className="flex items-center space-x-2">
