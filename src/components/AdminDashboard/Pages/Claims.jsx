@@ -128,8 +128,9 @@ export default function Claims() {
         throw error;
       }
     },
-    staleTime: Infinity,
-    retry: false,
+    staleTime: 2000,
+    refetchInterval: 2000,
+    refetchIntervalInBackground: true,
   });
 
   return (
