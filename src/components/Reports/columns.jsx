@@ -28,7 +28,7 @@ export const columns = [
       return <div className="font-medium">{formattedDate}</div>;
     },
   },
-  {
+  /* {
     accessorKey: "userId",
     header: "User ID",
     cell: ({ row }) => {
@@ -38,7 +38,7 @@ export const columns = [
         </div>
       );
     },
-  },
+  }, */
   {
     accessorKey: "claimId", // Mapping claimId to the table
     header: "Claim ID",
@@ -134,7 +134,7 @@ export const columns = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="w-8 h-8 p-0">
+            <Button variant="ghost" className="p-0 w-8 h-8">
               <span className="sr-only">Open menu</span>
               <MoreHorizontal />
             </Button>

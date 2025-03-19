@@ -19,7 +19,7 @@ const Filters = ({}) => {
   const timeInterval = searchParams.get("timeInterval") || "7days";
 
   return (
-    <div className="flex items-end justify-end w-full ">
+    <div className="flex justify-end items-end -mt-8 w-full">
       <Select
         onValueChange={(value) => {
           setSearchParams({ timeInterval: value });

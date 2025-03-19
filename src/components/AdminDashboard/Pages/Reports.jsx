@@ -43,8 +43,9 @@ const Reports = () => {
 
   return (
     <main className="flex flex-col gap-3">
+      <h1 className="text-4xl font-semibold">Policy Reports</h1>
       <Filters />
-      <div className="grid grid-cols-4 gap-3 ">
+      <div className="grid grid-cols-4 gap-3">
         <Card>
           <CardHeader>
             <CardTitle>Approved</CardTitle>
