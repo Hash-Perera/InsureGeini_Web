@@ -1,0 +1,46 @@
+# .github/workflows/deploy.yml
+name: Deploy insuregeini-web to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Write SSH key to file
+        run: |
+          echo "${{ secrets.EC2_KEY }}" > ./chathura_ec2.pem
+          chmod 600 ./chathura_ec2.pem
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          port: 22
+          key_path: ./chathura_ec2.pem
+          script: |
+            # update your repo
+              cd InsureGeini_Web
+              git pull origin main
+              cd ..
+            
+            # build step needed
+              cd InsureGeini_Web
+              npm install
+              npm run build
+
+              
+            # Start or restart with PM2
+            pm2 start dist/main.js --name insuregeini-web || pm2 restart insuregeini-web
+            pm2 save
+
+      - name: Clean up SSH key
+        run: rm ./chathura_ec2.pem
