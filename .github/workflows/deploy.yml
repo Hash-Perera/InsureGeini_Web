@@ -32,9 +32,10 @@ jobs:
             # Pull latest changes
             git pull origin main
 
-            # Install dependencies & build static files
+            # Install dependencies
             npm install
-            npm run build
+
+            pm2 restart insuregeini-web
 
             # Copy built files to Nginx www folder (adjust paths as needed)
             sudo rm -rf /var/www/insuregeini-web/*
