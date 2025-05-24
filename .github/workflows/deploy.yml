@@ -1,3 +1,4 @@
+# .github/workflows/deploy.yml
 name: Deploy insuregeini-web to EC2
 
 on:
@@ -15,7 +16,7 @@ jobs:
 
       - name: Write SSH key to file
         run: |
-          printf '%s\n' "${{ secrets.EC2_KEY }}" > ./chathura_ec2.pem
+          echo "${{ secrets.EC2_KEY }}" > ./chathura_ec2.pem
           chmod 600 ./chathura_ec2.pem
 
       - name: Deploy to EC2 via SSH
@@ -26,23 +27,16 @@ jobs:
           port: 22
           key_path: ./chathura_ec2.pem
           script: |
-            # Navigate to frontend repo
-            cd Insuregeini_Web
-
-            # Pull latest changes
-            git pull origin main
-
-            # Install dependencies
-            npm install
-
+            # update your repo
+              cd InsureGeini_Web
+              git pull origin main
+              npm install
+              cd ..
+            
+            # Start or restart with PM2
+            cd InsureGeini_Web
             pm2 restart insuregeini-web
-
-            # Copy built files to Nginx www folder (adjust paths as needed)
-            sudo rm -rf /var/www/insuregeini-web/*
-            sudo cp -r dist/* /var/www/insuregeini-web/
-
-            # Reload Nginx to serve updated files
-            sudo systemctl reload nginx
+            pm2 save
 
       - name: Clean up SSH key
         run: rm ./chathura_ec2.pem
