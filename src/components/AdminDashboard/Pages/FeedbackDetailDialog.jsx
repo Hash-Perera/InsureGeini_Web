@@ -45,8 +45,8 @@ const FeedbackDetailsDialog = ({ selectedFeedback, isDialogOpen, onClose }) => {
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={onClose}>
-      <DialogContent className="backdrop-blur-xl bg-white/90 shadow-2xl rounded-3xl p-8 max-w-2xl border border-gray-200">
-        <DialogHeader className="text-center mb-6">
+      <DialogContent className="backdrop-blur-xl bg-white/90 shadow-2xl max-h-[90vh] overflow-y-auto  rounded-3xl p-8 max-w-2xl border border-gray-200">
+        <DialogHeader className="mb-6 text-center">
           <DialogTitle className="text-3xl font-extrabold text-gray-900">
             Feedback Details
           </DialogTitle>
@@ -55,23 +55,23 @@ const FeedbackDetailsDialog = ({ selectedFeedback, isDialogOpen, onClose }) => {
         <div className="space-y-3">
           {/* User Information Section */}
           {userDetails && (
-            <div className="p-6 bg-white/70 backdrop-blur-lg rounded-2xl shadow-md border border-gray-300">
-              <h3 className="text-2xl font-bold text-gray-900 flex items-center gap-3 mb-4">
-                <User className="text-indigo-600 w-8 h-8" /> User Information
+            <div className="p-6 border border-gray-300 shadow-md bg-white/70 backdrop-blur-lg rounded-2xl">
+              <h3 className="flex items-center gap-3 mb-4 text-2xl font-bold text-gray-900">
+                <User className="w-8 h-8 text-indigo-600" /> User Information
               </h3>
-              <div className="grid grid-cols-2 gap-5 text-gray-800 text-base">
+              <div className="grid grid-cols-2 gap-5 text-base text-gray-800">
                 <p className="flex items-center gap-2">
-                  <Mail className="text-blue-600 w-6 h-6" />{" "}
+                  <Mail className="w-6 h-6 text-blue-600" />{" "}
                   <span className="font-semibold">Email:</span>
                 </p>
                 <p>{userDetails.email}</p>
                 <p className="flex items-center gap-2">
-                  <Phone className="text-blue-600 w-6 h-6" />{" "}
+                  <Phone className="w-6 h-6 text-blue-600" />{" "}
                   <span className="font-semibold">Phone:</span>
                 </p>
                 <p>{userDetails.mobileNumber}</p>
                 <p className="flex items-center gap-2">
-                  <Home className="text-blue-600 w-6 h-6" />{" "}
+                  <Home className="w-6 h-6 text-blue-600" />{" "}
                   <span className="font-semibold">Address:</span>
                 </p>
                 <p>{userDetails.address}</p>
@@ -81,16 +81,16 @@ const FeedbackDetailsDialog = ({ selectedFeedback, isDialogOpen, onClose }) => {
 
           {/* Feedback Details Section */}
           {feedbackDetails && (
-            <div className="p-6 bg-white/70 backdrop-blur-lg rounded-2xl shadow-md border border-gray-300">
-              <h3 className="text-2xl font-bold text-gray-900 flex items-center gap-3 mb-4">
-                <MessageCircle className="text-indigo-600 w-8 h-8" /> Feedback
+            <div className="p-6 border border-gray-300 shadow-md bg-white/70 backdrop-blur-lg rounded-2xl">
+              <h3 className="flex items-center gap-3 mb-4 text-2xl font-bold text-gray-900">
+                <MessageCircle className="w-8 h-8 text-indigo-600" /> Feedback
               </h3>
-              <p className="text-gray-700 italic text-lg">
+              <p className="text-lg italic text-gray-700">
                 "{feedbackDetails.feedback || "No feedback available"}"
               </p>
-              <div className="grid grid-cols-2 gap-3 text-gray-800 text-base mt-4">
+              <div className="grid grid-cols-2 gap-3 mt-4 text-base text-gray-800">
                 <p className="flex items-center gap-2 font-semibold">
-                  <Tag className="text-purple-600 w-6 h-6" /> Sentiment:
+                  <Tag className="w-6 h-6 text-purple-600" /> Sentiment:
                 </p>
                 <p
                   className={`px-4 py-2 rounded-full font-semibold ${
@@ -102,9 +102,9 @@ const FeedbackDetailsDialog = ({ selectedFeedback, isDialogOpen, onClose }) => {
                   {feedbackDetails.sentiment || "N/A"}
                 </p>
                 <p className="flex items-center gap-3 font-semibold">
-                  <Tag className="text-purple-600 w-6 h-6" /> Category:
+                  <Tag className="w-6 h-6 text-purple-600" /> Category:
                 </p>
-                <p className="px-4 py-2 rounded-full bg-blue-200 text-blue-800 font-semibold">
+                <p className="px-4 py-2 font-semibold text-blue-800 bg-blue-200 rounded-full">
                   {feedbackDetails.category || "N/A"}
                 </p>
               </div>
@@ -113,12 +113,12 @@ const FeedbackDetailsDialog = ({ selectedFeedback, isDialogOpen, onClose }) => {
 
           {/* Report Details Section */}
           {reportDetails && (
-            <div className="p-6 bg-white/70 backdrop-blur-lg rounded-2xl shadow-md border border-gray-300">
-              <h3 className="text-2xl font-bold text-gray-900 flex items-center gap-3 mb-4">
-                <FileText className="text-yellow-600 w-8 h-8" /> Report Details
+            <div className="p-6 border border-gray-300 shadow-md bg-white/70 backdrop-blur-lg rounded-2xl">
+              <h3 className="flex items-center gap-3 mb-4 text-2xl font-bold text-gray-900">
+                <FileText className="w-8 h-8 text-yellow-600" /> Report Details
               </h3>
 
-              <div className="text-gray-800 text-base space-y-2">
+              <div className="space-y-2 text-base text-gray-800">
                 <p>
                   Status:{" "}
                   <span className="font-semibold">{reportDetails.status}</span>
@@ -126,14 +126,14 @@ const FeedbackDetailsDialog = ({ selectedFeedback, isDialogOpen, onClose }) => {
                 <p>Reason: {reportDetails.reason}</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-6 text-gray-800 text-base mt-4">
-                <p className="bg-gray-100 px-4 py-2 rounded-lg shadow-sm">
+              <div className="grid grid-cols-2 gap-6 mt-4 text-base text-gray-800">
+                <p className="px-4 py-2 bg-gray-100 rounded-lg shadow-sm">
                   Estimation Approved:{" "}
                   <span className="font-semibold">
                     ${reportDetails.estimation_approved}
                   </span>
                 </p>
-                <p className="bg-gray-100 px-4 py-2 rounded-lg shadow-sm">
+                <p className="px-4 py-2 bg-gray-100 rounded-lg shadow-sm">
                   Estimation Requested:{" "}
                   <span className="font-semibold">
                     ${reportDetails.estimation_requested}
@@ -141,12 +141,12 @@ const FeedbackDetailsDialog = ({ selectedFeedback, isDialogOpen, onClose }) => {
                 </p>
               </div>
 
-              <div className="flex flex-col md:flex-row gap-4 mt-6">
+              <div className="flex flex-col gap-4 mt-6 md:flex-row">
                 <a
                   href={reportDetails.decisionReport}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-700 hover:text-blue-900 text-base font-medium flex items-center gap-2 bg-blue-100 px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition"
+                  className="flex items-center gap-2 px-4 py-2 text-base font-medium text-blue-700 transition bg-blue-100 rounded-lg shadow-md hover:text-blue-900 hover:shadow-lg"
                 >
                   <Download className="w-5 h-5" /> Download Decision Report
                 </a>
@@ -154,7 +154,7 @@ const FeedbackDetailsDialog = ({ selectedFeedback, isDialogOpen, onClose }) => {
                   href={reportDetails.incidentReport}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-700 hover:text-blue-900 text-base font-medium flex items-center gap-2 bg-blue-100 px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition"
+                  className="flex items-center gap-2 px-4 py-2 text-base font-medium text-blue-700 transition bg-blue-100 rounded-lg shadow-md hover:text-blue-900 hover:shadow-lg"
                 >
                   <Download className="w-5 h-5" /> Download Incident Report
                 </a>
